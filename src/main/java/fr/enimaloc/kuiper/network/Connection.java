@@ -150,15 +150,15 @@ public class Connection extends Thread {
 
     public void terminate(Throwable e) {
         LOGGER.error(NETWORK, "Connection terminated", e);
-        try {
-            socket.close();
-        } catch (IOException ioException) {
-            LOGGER.error(NETWORK, "Error while closing socket", ioException);
-        }
+        terminate();
     }
 
     public void terminate(String reason) {
         LOGGER.debug(NETWORK, "Connection terminated: {}", reason);
+        terminate();
+    }
+
+    public void terminate() {
         try {
             socket.close();
         } catch (IOException e) {
