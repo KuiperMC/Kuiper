@@ -209,4 +209,8 @@ public class BinaryReader extends InputStream {
         //buffer.get(startingPosition, output);
         return output;
     }
+
+    public boolean hasNext() {
+        return buffer.hasRemaining();
+    }
 }

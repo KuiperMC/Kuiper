@@ -11,6 +11,7 @@ import fr.enimaloc.kuiper.GameState;
 import fr.enimaloc.kuiper.exception.PacketNotFoundException;
 import fr.enimaloc.kuiper.network.data.BinaryReader;
 import fr.enimaloc.kuiper.network.data.Writeable;
+import fr.enimaloc.kuiper.network.packet.login.ServerboundLoginStart;
 import fr.enimaloc.kuiper.network.packet.status.ServerboundPingRequest;
 import fr.enimaloc.kuiper.network.packet.status.ServerboundStatusRequest;
 import fr.enimaloc.kuiper.network.packet.unknown.ServerboundHandshake;
@@ -48,7 +49,9 @@ public interface Packet {
         STATUS_REQUEST(Type.SERVERBOUND, 0x00, GameState.STATUS, ServerboundStatusRequest::new),
         STATUS_RESPONSE(Type.CLIENTBOUND, 0x00, GameState.STATUS),
         PING_REQUEST(Type.SERVERBOUND, 0x01, GameState.STATUS, ServerboundPingRequest::new),
-        PONG_RESPONSE(Type.CLIENTBOUND, 0x01, GameState.STATUS);
+        PONG_RESPONSE(Type.CLIENTBOUND, 0x01, GameState.STATUS),
+
+        LOGIN_START(Type.SERVERBOUND, 0x00, GameState.LOGIN, ServerboundLoginStart::new),
         ;
 
         public final GameState                                state;
