@@ -10,10 +10,9 @@ package fr.enimaloc.kuiper;
 /**
  *
  */
-public
-enum GameState {
+public enum GameState {
+    UNKNOWN,
     STATUS,
     LOGIN,
     PLAY,
-    UNKNOWN,
 }
