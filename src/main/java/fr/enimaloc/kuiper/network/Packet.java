@@ -45,7 +45,7 @@ public interface Packet {
         HANDSHAKE(Type.SERVERBOUND, 0x00, GameState.UNKNOWN, ServerboundHandshake::new),
 
         STATUS_REQUEST(Type.SERVERBOUND, 0x00, GameState.STATUS, ServerboundStatusRequest::new),
-
+        STATUS_RESPONSE(Type.CLIENTBOUND, 0x00, GameState.STATUS),
         ;
 
         public final GameState                                state;
