@@ -8,10 +8,18 @@
 package fr.enimaloc.kuiper.network;
 
 import ch.qos.logback.classic.Logger;
+import fr.enimaloc.kuiper.GameState;
+import fr.enimaloc.kuiper.network.data.BinaryReader;
+import fr.enimaloc.kuiper.utils.VarIntUtils;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;
@@ -26,9 +34,13 @@ public class Connection extends Thread {
 
     public static final Logger LOGGER = (Logger) LoggerFactory.getLogger(Connection.class);
 
-    @NotNull private final Socket socket;
-    @NotNull private final List<Packet> exchangedPackets = new ArrayList<>();
-    @Nullable private Packet lastReceived;
+    @NotNull
+    private final Socket       socket;
+    @NotNull
+    private final List<Packet> exchangedPackets = new ArrayList<>();
+    public        GameState    gameState        = GameState.UNKNOWN;
+    @Nullable
+    private       Packet       lastReceived;
 
     public Connection(@NotNull Socket socket) {
         LOGGER.debug(NETWORK, "New connection from {}", socket.getInetAddress().getHostAddress());
@@ -41,20 +53,62 @@ public class Connection extends Thread {
 
     @Override
     public void run() {
+        InputStream inputStream;
+        try {
+            inputStream = socket.getInputStream();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         while (!socket.isClosed()) {
-//            VarIntUtils.VarInt lenVarInt = VarIntUtils.readVarInt(inputStream);
-//            if (lenVarInt == null) {
-//                return null;
-//            }
-//
+            try {
+                VarIntUtils.VarInt lenVarInt = VarIntUtils.readVarInt(inputStream);
+                if (lenVarInt == null) {
+                    lastReceived = null;
+                    continue;
+                }
+                try (BinaryReader reader
+                             = new BinaryReader(ByteBuffer.allocate(lenVarInt.value() + lenVarInt.length())
+                                                          .put(VarIntUtils.getVarInt(lenVarInt.value()))
+                                                          .put(inputStream.readNBytes(lenVarInt.value()))
+                                                          .rewind())) {
+
+                    int                length   = reader.readVarInt();
+                    int                packetId = reader.readVarInt();
+                    Packet.Serverbound packet   = Packet.Serverbound.get(packetId, gameState).build(reader);
+                    LOGGER.makeLoggingEventBuilder(Level.DEBUG)
+                          .addMarker(NETWORK)
+                          .addMarker(NETWORK_IN)
+                          .log("{} -> SERVER: {}", socket.getInetAddress().getHostAddress(), packet);
+
+                    if (LOGGER.isTraceEnabled()) {
+                        AtomicInteger i = new AtomicInteger(0);
+                        LOGGER.makeLoggingEventBuilder(Level.TRACE)
+                              .addMarker(NETWORK)
+                              .addMarker(NETWORK_IN)
+                              .log("{} => SERVER: {}",
+                                   socket.getInetAddress().getHostAddress(),
+                                   Stream.generate(() -> reader.getBuffer().array()[i.getAndIncrement()])
+                                         .limit(reader.getBuffer().limit())
+                                         .map(j -> String.format("%02x", j))
+                                         .collect(Collectors.joining(" ")));
+                    }
+
 //            int length = lenVarInt.value();
 //            return ByteBuffer.allocate(length + lenVarInt.length())
 //                             .put(VarIntUtils.getVarInt(length))
 //                             .put(inputStream.readNBytes(length));
-            Packet.Serverbound packet = null;
 
-            exchangedPackets.add(packet);
-            packet.handle(this);
+                    exchangedPackets.add(packet);
+                    packet.handle(this);
+                    lastReceived = packet;
+                }
+            } catch (IOException e) {
+//                LOGGER.makeLoggingEventBuilder(Level.ERROR)
+//                      .addMarker(NETWORK)
+//                      .setCause(e)
+//                      .log("Error while reading packet");
+                terminate(e);
+            }
         }
     }
 
@@ -63,7 +117,7 @@ public class Connection extends Thread {
         LOGGER.makeLoggingEventBuilder(Level.DEBUG)
               .addMarker(NETWORK)
               .addMarker(NETWORK_OUT)
-              .log("-> {}: {}", socket.getInetAddress().getHostAddress(), packet);
+              .log("SERVER -> {}: {}", socket.getInetAddress().getHostAddress(), packet);
     }
 
     public void terminate(Throwable e) {

@@ -7,6 +7,7 @@
  */
 package fr.enimaloc.kuiper.network.data;
 
+import fr.enimaloc.kuiper.utils.VarIntUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -65,19 +66,11 @@ public class BinaryReader extends InputStream {
     }
 
     public int readVarInt() {
-        int numRead = 0;
-        int result  = 0;
-        byte read;
-        do {
-            read = buffer.get();
-            int value = (read & 0b01111111);
-            result |= (value << (7 * numRead));
-            numRead++;
-            if (numRead > 5) {
-                throw new RuntimeException("VarInt is too big");
-            }
-        } while ((read & 0b10000000) != 0);
-        return result;
+        try {
+            return VarIntUtils.readVarInt(this).value();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public long readVarLong() {

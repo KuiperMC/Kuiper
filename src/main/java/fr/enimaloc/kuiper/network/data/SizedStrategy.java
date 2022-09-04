@@ -13,7 +13,7 @@ import java.util.function.Function;
 /**
  *
  */
-enum SizedStrategy {
+public enum SizedStrategy {
     VARINT((i, writer) -> writer.writeVarInt(i.intValue()), BinaryReader::readVarInt),
     SHORT((i, writer) -> writer.writeShort(i.shortValue()), BinaryReader::readByte),
     INT((i, writer) -> writer.writeInt(i.intValue()), BinaryReader::readInt),
