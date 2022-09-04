@@ -48,6 +48,7 @@ public interface Packet {
         STATUS_REQUEST(Type.SERVERBOUND, 0x00, GameState.STATUS, ServerboundStatusRequest::new),
         STATUS_RESPONSE(Type.CLIENTBOUND, 0x00, GameState.STATUS),
         PING_REQUEST(Type.SERVERBOUND, 0x01, GameState.STATUS, ServerboundPingRequest::new),
+        PONG_RESPONSE(Type.CLIENTBOUND, 0x01, GameState.STATUS);
         ;
 
         public final GameState                                state;
