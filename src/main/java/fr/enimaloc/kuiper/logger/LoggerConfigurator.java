@@ -52,7 +52,7 @@ public class LoggerConfigurator extends ContextAwareBase implements Configurator
 
         Logger root = loggerContext.getLogger(Logger.ROOT_LOGGER_NAME);
         root.setAdditive(false);
-        root.setLevel(Level.DEBUG);
+        root.setLevel(Level.TRACE);
         root.addAppender(appender);
 
         return ExecutionStatus.DO_NOT_INVOKE_NEXT_IF_ANY;
