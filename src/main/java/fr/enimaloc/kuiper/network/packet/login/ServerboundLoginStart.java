@@ -14,6 +14,7 @@ import fr.enimaloc.kuiper.network.data.BinaryReader;
 import fr.enimaloc.kuiper.network.data.SizedStrategy;
 import fr.enimaloc.kuiper.utils.SimpleClassDescriptor;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  *
@@ -27,7 +28,8 @@ public class ServerboundLoginStart extends SimpleClassDescriptor implements Pack
     public ServerboundLoginStart(BinaryReader reader) {
         this.username = reader.readString(SizedStrategy.VARINT);
         this.sigData  = reader.hasNext() && reader.readBoolean() ? new SigData(reader) : null;
-        this.uuid     = reader.hasNext() && reader.readBoolean() ? reader.readUUID() : Providers.uuidProvider.get(this.username);
+        this.uuid     = reader.hasNext() && reader.readBoolean() ? reader.readUUID() : Providers.uuidProvider.get(
+                this.username);
     }
 
     @Override
@@ -37,7 +39,11 @@ public class ServerboundLoginStart extends SimpleClassDescriptor implements Pack
 
     @Override
     public void handle(Connection connection) {
-
+        if (connection.server.settings.onlineMode) {
+            connection.nonce = new byte[4];
+            ThreadLocalRandom.current().nextBytes(connection.nonce);
+            connection.sendPacket(new ClientboundEncryptionRequest().verifyToken(connection.nonce));
+        }
     }
 
     public record SigData(long timestamp, byte[] publicKey, byte[] signature) {

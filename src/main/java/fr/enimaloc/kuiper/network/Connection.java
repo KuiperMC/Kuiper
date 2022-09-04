@@ -9,6 +9,7 @@ package fr.enimaloc.kuiper.network;
 
 import ch.qos.logback.classic.Logger;
 import fr.enimaloc.kuiper.GameState;
+import fr.enimaloc.kuiper.MinecraftServer;
 import fr.enimaloc.kuiper.network.data.BinaryReader;
 import fr.enimaloc.kuiper.network.data.BinaryWriter;
 import fr.enimaloc.kuiper.utils.VarIntUtils;
@@ -31,25 +32,25 @@ import static fr.enimaloc.kuiper.MinecraftServer.Markers.*;
 /**
  *
  */
-public class Connection extends Thread {
+public class Connection implements Runnable {
 
     public static final Logger LOGGER = (Logger) LoggerFactory.getLogger(Connection.class);
 
-    @NotNull
-    private final Socket       socket;
-    @NotNull
-    private final List<Packet> exchangedPackets = new ArrayList<>();
-    public        GameState    gameState        = GameState.UNKNOWN;
-    @Nullable
-    private       Packet       lastReceived;
+    @NotNull public final  MinecraftServer server;
+    @NotNull private final Socket          socket;
+    @NotNull private final List<Packet>    exchangedPackets = new ArrayList<>();
+    public                 GameState       gameState        = GameState.UNKNOWN;
+    @Nullable private      Packet          lastReceived;
+    @Nullable public       byte[]          nonce;
 
-    public Connection(@NotNull Socket socket) {
+    public Connection(@NotNull Socket socket, @NotNull MinecraftServer server) {
         LOGGER.debug(NETWORK, "New connection from {}", socket.getInetAddress().getHostAddress());
         this.socket = socket;
+        this.server = server;
     }
 
     public Connection(Object... args) {
-        this((Socket) args[0]);
+        this((Socket) args[0], (MinecraftServer) args[1]);
     }
 
     @Override
@@ -67,11 +68,10 @@ public class Connection extends Thread {
                     lastReceived = null;
                     continue;
                 }
-                try (BinaryReader reader
-                             = new BinaryReader(ByteBuffer.allocate(lenVarInt.value() + lenVarInt.length())
-                                                          .put(VarIntUtils.getVarInt(lenVarInt.value()))
-                                                          .put(inputStream.readNBytes(lenVarInt.value()))
-                                                          .rewind())) {
+                try (BinaryReader reader = new BinaryReader(ByteBuffer.allocate(lenVarInt.value() + lenVarInt.length())
+                                                                      .put(VarIntUtils.getVarInt(lenVarInt.value()))
+                                                                      .put(inputStream.readNBytes(lenVarInt.value()))
+                                                                      .rewind())) {
 
                     int                length   = reader.readVarInt();
                     int                packetId = reader.readVarInt();
@@ -115,14 +115,13 @@ public class Connection extends Thread {
 
     public void sendPacket(Packet.Clientbound packet) {
         exchangedPackets.add(packet);
-        LOGGER.makeLoggingEventBuilder(Level.DEBUG)
-              .addMarker(NETWORK)
-              .addMarker(NETWORK_OUT)
-              .log("SERVER -> {}: {}", socket.getInetAddress().getHostAddress(), packet);
+        LOGGER.makeLoggingEventBuilder(Level.DEBUG).addMarker(NETWORK).addMarker(NETWORK_OUT).log("SERVER -> {}: {}",
+                                                                                                  socket.getInetAddress()
+                                                                                                        .getHostAddress(),
+                                                                                                  packet);
         try (BinaryWriter writer = new BinaryWriter(0).writeVarInt(packet.id())
                                                       .write(packet)
-                                                      .trim();
-        ) {
+                                                      .trim()) {
             byte[] varInt = VarIntUtils.getVarInt(writer.getBuffer().array().length);
             byte[] bytes  = new byte[writer.getBuffer().array().length + varInt.length];
             System.arraycopy(varInt, 0, bytes, 0, varInt.length);

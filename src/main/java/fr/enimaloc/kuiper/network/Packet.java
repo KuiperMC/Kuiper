@@ -11,10 +11,9 @@ import fr.enimaloc.kuiper.GameState;
 import fr.enimaloc.kuiper.exception.PacketNotFoundException;
 import fr.enimaloc.kuiper.network.data.BinaryReader;
 import fr.enimaloc.kuiper.network.data.Writeable;
-import fr.enimaloc.kuiper.network.packet.login.ServerboundLoginStart;
-import fr.enimaloc.kuiper.network.packet.status.ServerboundPingRequest;
-import fr.enimaloc.kuiper.network.packet.status.ServerboundStatusRequest;
-import fr.enimaloc.kuiper.network.packet.unknown.ServerboundHandshake;
+import fr.enimaloc.kuiper.network.packet.login.*;
+import fr.enimaloc.kuiper.network.packet.status.*;
+import fr.enimaloc.kuiper.network.packet.unknown.*;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
@@ -52,6 +51,7 @@ public interface Packet {
         PONG_RESPONSE(Type.CLIENTBOUND, 0x01, GameState.STATUS),
 
         LOGIN_START(Type.SERVERBOUND, 0x00, GameState.LOGIN, ServerboundLoginStart::new),
+        ENCRYPTION_REQUEST(Type.CLIENTBOUND, 0x01, GameState.LOGIN),
         ;
 
         public final GameState                                state;
