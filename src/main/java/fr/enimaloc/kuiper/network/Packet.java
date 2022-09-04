@@ -11,6 +11,7 @@ import fr.enimaloc.kuiper.GameState;
 import fr.enimaloc.kuiper.exception.PacketNotFoundException;
 import fr.enimaloc.kuiper.network.data.BinaryReader;
 import fr.enimaloc.kuiper.network.data.Writeable;
+import fr.enimaloc.kuiper.network.packet.unknown.ServerboundHandshake;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
@@ -40,6 +41,7 @@ public interface Packet {
     }
 
     enum PacketList {
+        HANDSHAKE(Type.SERVERBOUND, 0x00, GameState.UNKNOWN, ServerboundHandshake::new),
         ;
 
         public final GameState                                state;
