@@ -18,11 +18,11 @@ class SimpleClassDescriptor {
     @Override
     public String toString() {
         StringJoiner joiner = new StringJoiner(", ", getClass().getSimpleName() + "{", "}");
-        for (Field field : getClass().getFields()) {
+        for (Field field : getClass().getDeclaredFields()) {
             try {
                 joiner.add(field.getName()
                            + (field.getDeclaringClass() == String.class ? "='" : "=")
-                           + field.get(this)
+                           + (field.trySetAccessible() ? field.get(this) : "non-accessible")
                            + (field.getDeclaringClass() == String.class ? "'" : ""));
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
