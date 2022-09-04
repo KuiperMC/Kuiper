@@ -10,6 +10,7 @@ package fr.enimaloc.kuiper.network;
 import ch.qos.logback.classic.Logger;
 import fr.enimaloc.kuiper.GameState;
 import fr.enimaloc.kuiper.network.data.BinaryReader;
+import fr.enimaloc.kuiper.network.data.BinaryWriter;
 import fr.enimaloc.kuiper.utils.VarIntUtils;
 import java.io.IOException;
 import java.io.InputStream;
@@ -118,6 +119,33 @@ public class Connection extends Thread {
               .addMarker(NETWORK)
               .addMarker(NETWORK_OUT)
               .log("SERVER -> {}: {}", socket.getInetAddress().getHostAddress(), packet);
+        try (BinaryWriter writer = new BinaryWriter(0).writeVarInt(packet.id())
+                                                      .write(packet)
+                                                      .trim();
+        ) {
+            byte[] varInt = VarIntUtils.getVarInt(writer.getBuffer().array().length);
+            byte[] bytes  = new byte[writer.getBuffer().array().length + varInt.length];
+            System.arraycopy(varInt, 0, bytes, 0, varInt.length);
+            System.arraycopy(writer.getBuffer().array(), 0, bytes, varInt.length, writer.getBuffer().array().length);
+
+            if (LOGGER.isTraceEnabled()) {
+                AtomicInteger i = new AtomicInteger(0);
+                LOGGER.makeLoggingEventBuilder(Level.TRACE)
+                      .addMarker(NETWORK)
+                      .addMarker(NETWORK_OUT)
+                      .log("SERVER => {}: {}",
+                           socket.getInetAddress().getHostAddress(),
+                           Stream.generate(() -> bytes[i.getAndIncrement()])
+                                 .limit(bytes.length)
+                                 .map(j -> String.format("%02x", j))
+                                 .collect(Collectors.joining(" ")));
+            }
+
+            socket.getOutputStream().write(bytes);
+            socket.getOutputStream().flush();
+        } catch (IOException e) {
+            terminate(e);
+        }
     }
 
     public void terminate(Throwable e) {

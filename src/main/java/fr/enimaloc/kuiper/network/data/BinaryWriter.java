@@ -49,11 +49,18 @@ public class BinaryWriter extends OutputStream {
         final int position = buffer.position();
         if (position + length >= buffer.limit()) {
             final int newLength = (position + length) * 4;
-            var copy = buffer.isDirect() ?
-                    ByteBuffer.allocateDirect(newLength) : ByteBuffer.allocate(newLength);
-            copy.put(buffer.flip());
-            this.buffer = copy;
+            resize(newLength);
         }
+    }
+
+    private void resize(int length) {
+        if (!resizable) {
+            return;
+        }
+        var copy = buffer.isDirect() ?
+                ByteBuffer.allocateDirect(length) : ByteBuffer.allocate(length);
+        copy.put(buffer.flip());
+        this.buffer = copy;
     }
 
     public BinaryWriter writeByte(byte b) {
@@ -131,9 +138,8 @@ public class BinaryWriter extends OutputStream {
     }
 
     public BinaryWriter writeString(String s, SizedStrategy strategy) {
-        final byte[] bytes = s.getBytes();
-        strategy.writer.accept(bytes.length, this);
-        writeBytes(bytes);
+        strategy.writer.accept(s.length(), this);
+        writeBytes(s.getBytes());
         return this;
     }
 
@@ -221,7 +227,9 @@ public class BinaryWriter extends OutputStream {
         return write(writer.buffer);
     }
 
-    public <T> BinaryWriter writeList(Collection<T> list, BiConsumer<BinaryWriter, T> consumer, SizedStrategy strategy) {
+    public <T> BinaryWriter writeList(
+            Collection<T> list, BiConsumer<BinaryWriter, T> consumer, SizedStrategy strategy
+    ) {
         if (list == null) {
             strategy.writer.accept(0, this);
             return this;
@@ -266,6 +274,18 @@ public class BinaryWriter extends OutputStream {
     @Override
     public void write(int b) throws IOException {
         writeByte((byte) b);
+    }
+
+    public BinaryWriter trim() {
+        int j = 0;
+        for (int i = buffer.limit() - 1; i >= 0; i--) {
+            if (buffer.get(i) != 0) {
+                j = i;
+                break;
+            }
+        }
+        resize(j + 1);
+        return this;
     }
 
     public static byte[] makeArray(Consumer<BinaryWriter> writing) {

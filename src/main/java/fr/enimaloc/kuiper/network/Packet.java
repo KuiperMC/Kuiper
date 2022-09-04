@@ -10,6 +10,7 @@ package fr.enimaloc.kuiper.network;
 import fr.enimaloc.kuiper.GameState;
 import fr.enimaloc.kuiper.exception.PacketNotFoundException;
 import fr.enimaloc.kuiper.network.data.BinaryReader;
+import fr.enimaloc.kuiper.network.data.Writeable;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
@@ -23,8 +24,7 @@ public interface Packet {
 
     int id();
 
-    public interface Clientbound extends Packet {
-        byte[] toBytes();
+    public interface Clientbound extends Packet, Writeable {
     }
 
     public interface Serverbound extends Packet {
