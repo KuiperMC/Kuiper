@@ -13,9 +13,7 @@ import fr.enimaloc.kuiper.network.data.SizedStrategy;
 import fr.enimaloc.kuiper.network.data.Writeable;
 import fr.enimaloc.kuiper.objects.Identifier;
 import fr.enimaloc.kuiper.utils.SimpleClassDescriptor;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -43,7 +41,11 @@ public class ClientboundUpdateTags extends SimpleClassDescriptor implements Pack
         if (this.tags.containsKey(identifier)) {
             this.tags.get(identifier).addAll(tags);
         } else {
-            this.tags.put(identifier, tags);
+            if (tags.getClass().getName().contains("Unmodifiable") || tags.getClass().getName().contains("Immutable")) {
+                this.tags.put(identifier, new ArrayList<>(tags));
+            } else {
+                this.tags.put(identifier, tags);
+            }
         }
         return this;
     }
