@@ -12,7 +12,7 @@ import fr.enimaloc.kuiper.exception.PacketNotFoundException;
 import fr.enimaloc.kuiper.network.data.BinaryReader;
 import fr.enimaloc.kuiper.network.data.Writeable;
 import fr.enimaloc.kuiper.network.packet.login.*;
-import fr.enimaloc.kuiper.network.packet.play.ServerboundClientInformation;
+import fr.enimaloc.kuiper.network.packet.play.*;
 import fr.enimaloc.kuiper.network.packet.status.*;
 import fr.enimaloc.kuiper.network.packet.unknown.*;
 import java.util.Arrays;
@@ -46,22 +46,22 @@ public interface Packet {
     enum PacketList {
         HANDSHAKE(Type.SERVERBOUND, 0x00, GameState.UNKNOWN, ServerboundHandshake::new),
 
-        STATUS_REQUEST(Type.SERVERBOUND, 0x00, GameState.STATUS, ServerboundStatusRequest::new),
-        STATUS_RESPONSE(Type.CLIENTBOUND, 0x00, GameState.STATUS),
-        PING_REQUEST(Type.SERVERBOUND, 0x01, GameState.STATUS, ServerboundPingRequest::new),
-        PONG_RESPONSE(Type.CLIENTBOUND, 0x01, GameState.STATUS),
+        SERVERBOUND_STATUS_REQUEST(Type.SERVERBOUND, 0x00, GameState.STATUS, ServerboundStatusRequest::new),
+        CLIENTBOUND_STATUS_RESPONSE(Type.CLIENTBOUND, 0x00, GameState.STATUS),
+        SERVERBOUND_PING_REQUEST(Type.SERVERBOUND, 0x01, GameState.STATUS, ServerboundPingRequest::new),
+        CLIENTBOUND_PONG_RESPONSE(Type.CLIENTBOUND, 0x01, GameState.STATUS),
 
-        LOGIN_START(Type.SERVERBOUND, 0x00, GameState.LOGIN, ServerboundLoginStart::new),
-        ENCRYPTION_REQUEST(Type.CLIENTBOUND, 0x01, GameState.LOGIN),
-        ENCRYPTION_RESPONSE(Type.SERVERBOUND, 0x01, GameState.LOGIN, ServerboundEncryptionResponse::new),
-        SET_COMPRESSION(Type.CLIENTBOUND, 0x03, GameState.LOGIN),
-        LOGIN_SUCCESS(Type.CLIENTBOUND, 0x02, GameState.LOGIN),
+        SERVERBOUND_LOGIN_START(Type.SERVERBOUND, 0x00, GameState.LOGIN, ServerboundLoginStart::new),
+        CLIENTBOUND_ENCRYPTION_REQUEST(Type.CLIENTBOUND, 0x01, GameState.LOGIN),
+        SERVERBOUND_ENCRYPTION_RESPONSE(Type.SERVERBOUND, 0x01, GameState.LOGIN, ServerboundEncryptionResponse::new),
+        CLIENTBOUND_SET_COMPRESSION(Type.CLIENTBOUND, 0x03, GameState.LOGIN),
+        CLIENTBOUND_LOGIN_SUCCESS(Type.CLIENTBOUND, 0x02, GameState.LOGIN),
 
-        CLIENT_INFORMATION(Type.SERVERBOUND, 0x07, GameState.PLAY, ServerboundClientInformation::new),
-        CHANGE_DIFFICULTY(Type.CLIENTBOUND, 0x0B, GameState.PLAY),
-        CUSTOM_PAYLOAD(Type.CLIENTBOUND, 0x15, GameState.PLAY),
-        LOGIN(Type.CLIENTBOUND, 0x23, GameState.PLAY),
-        PLAYER_ABILITIES(Type.CLIENTBOUND, 0x2F, GameState.PLAY),
+        SERVERBOUND_CLIENT_INFORMATION(Type.SERVERBOUND, 0x07, GameState.PLAY, ServerboundClientInformation::new),
+        CLIENTBOUND_CHANGE_DIFFICULTY(Type.CLIENTBOUND, 0x0B, GameState.PLAY),
+        CLIENTBOUND_CUSTOM_PAYLOAD(Type.CLIENTBOUND, 0x15, GameState.PLAY),
+        CLIENTBOUND_LOGIN(Type.CLIENTBOUND, 0x23, GameState.PLAY),
+        CLIENTBOUND_PLAYER_ABILITIES(Type.CLIENTBOUND, 0x2F, GameState.PLAY),
         ;
 
         public final GameState                                state;
