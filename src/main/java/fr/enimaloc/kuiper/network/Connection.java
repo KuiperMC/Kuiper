@@ -17,6 +17,7 @@ import fr.enimaloc.kuiper.network.packet.play.ClientboundChangeDifficulty;
 import fr.enimaloc.kuiper.network.packet.play.ClientboundLogin;
 import fr.enimaloc.kuiper.network.packet.play.ClientboundCustomPayload;
 import fr.enimaloc.kuiper.network.packet.play.ClientboundPlayerAbilities;
+import fr.enimaloc.kuiper.network.packet.unknown.ServerboundHandshake;
 import fr.enimaloc.kuiper.objects.Gamemode;
 import fr.enimaloc.kuiper.objects.Identifier;
 import fr.enimaloc.kuiper.utils.VarIntUtils;
@@ -139,10 +140,13 @@ public class Connection implements Runnable {
 
     public void sendPacket(Packet.Clientbound packet) {
         exchangedPackets.add(packet);
-        LOGGER.makeLoggingEventBuilder(Level.DEBUG).addMarker(NETWORK).addMarker(NETWORK_OUT).log("SERVER -> {}: {}",
-                                                                                                  socket.getInetAddress()
-                                                                                                        .getHostAddress(),
-                                                                                                  packet);
+        LOGGER.makeLoggingEventBuilder(Level.DEBUG)
+              .addMarker(NETWORK)
+              .addMarker(NETWORK_OUT)
+              .log("SERVER -> {}: {}",
+                   socket.getInetAddress().getHostAddress(),
+                   packet);
+
         try (BinaryWriter writer = new BinaryWriter(
                 BinaryWriter.makeArray(packet::write).length
                 + VarIntUtils.varIntSize(packet.id()), false).writeVarInt(packet.id())
@@ -199,12 +203,13 @@ public class Connection implements Runnable {
         this.sendPacket(new ClientboundLogin().entityId(0)
                                 .gamemode(Gamemode.CREATIVE)
                                 .previousGamemode(Gamemode.CREATIVE)
-                                .dimensions(Identifier.kuiper("world"))
+                                .dimensions(Identifier.minecraft("overworld"))
                                 .registry(getRegistryCodec())
                                 .dimensionType(Identifier.minecraft("overworld"))
-                                .dimensionName(Identifier.kuiper("world"))
+                                .dimensionName(Identifier.minecraft("world"))
                                 .viewDistance(2)
-                                .simulationDistance(2));
+                                .simulationDistance(2)
+                                .debug(true));
         this.sendPacket(ClientboundCustomPayload.brand().data("Kuiper"));
         this.sendPacket(new ClientboundChangeDifficulty().difficulty(Difficulty.PEACEFUL).locked(false));
         this.sendPacket(new ClientboundPlayerAbilities().flying(true));

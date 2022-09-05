@@ -23,7 +23,7 @@ public record Dimension(Identifier name,
                         double coordinateScale,
                         boolean ultrawarm, boolean ceiling) {
 
-    public static final Dimension WORLD = new Dimension(
+    public static final Dimension OVERWORLD = new Dimension(
             Identifier.minecraft("overworld"),
             false,
             true,
