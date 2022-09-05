@@ -8,6 +8,7 @@
 package fr.enimaloc.kuiper.network.packet.login;
 
 import fr.enimaloc.kuiper.constant.Providers;
+import fr.enimaloc.kuiper.entities.Player;
 import fr.enimaloc.kuiper.network.Connection;
 import fr.enimaloc.kuiper.network.Packet;
 import fr.enimaloc.kuiper.network.data.BinaryReader;
@@ -39,6 +40,7 @@ public class ServerboundLoginStart extends SimpleClassDescriptor implements Pack
 
     @Override
     public void handle(Connection connection) {
+        connection.player = new Player(connection).name(username).uuid(uuid);
         if (connection.server.settings.onlineMode) {
             connection.nonce = new byte[4];
             ThreadLocalRandom.current().nextBytes(connection.nonce);

@@ -10,11 +10,13 @@ package fr.enimaloc.kuiper.network;
 import ch.qos.logback.classic.Logger;
 import fr.enimaloc.kuiper.GameState;
 import fr.enimaloc.kuiper.MinecraftServer;
+import fr.enimaloc.kuiper.entities.Player;
 import fr.enimaloc.kuiper.network.data.BinaryReader;
 import fr.enimaloc.kuiper.network.data.BinaryWriter;
 import fr.enimaloc.kuiper.utils.VarIntUtils;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -26,6 +28,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
+
+import javax.crypto.SecretKey;
 
 import static fr.enimaloc.kuiper.MinecraftServer.Markers.*;
 
@@ -40,6 +44,9 @@ public class Connection implements Runnable {
     @NotNull private final Socket          socket;
     @NotNull private final List<Packet>    exchangedPackets = new ArrayList<>();
     public                 GameState       gameState        = GameState.UNKNOWN;
+    @Nullable public       Player          player;
+    @Nullable
+    public                 SecretKey       encryptionKey;
     @Nullable private      Packet          lastReceived;
     @Nullable public       byte[]          nonce;
 
@@ -163,5 +170,9 @@ public class Connection implements Runnable {
         } catch (IOException e) {
             LOGGER.error(NETWORK, "Error while closing socket", e);
         }
+    }
+
+    public InetAddress getRemoteAddress() {
+        return socket.getInetAddress();
     }
 }

@@ -52,6 +52,7 @@ public interface Packet {
 
         LOGIN_START(Type.SERVERBOUND, 0x00, GameState.LOGIN, ServerboundLoginStart::new),
         ENCRYPTION_REQUEST(Type.CLIENTBOUND, 0x01, GameState.LOGIN),
+        ENCRYPTION_RESPONSE(Type.SERVERBOUND, 0x001, GameState.LOGIN, ServerboundEncryptionResponse::new),
         ;
 
         public final GameState                                state;
