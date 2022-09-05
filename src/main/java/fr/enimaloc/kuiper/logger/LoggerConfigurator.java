@@ -12,6 +12,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.Configurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.ThrowableProxy;
 import ch.qos.logback.core.ConsoleAppender;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.LayoutBase;
@@ -25,6 +26,7 @@ import java.nio.charset.StandardCharsets;
  */
 public class LoggerConfigurator extends ContextAwareBase implements Configurator {
     public static final boolean DISPLAY_IF_NOT_SOURCE = false;
+    public static final int     MAX_STACKTRACE_DEPTH  = 10;
 
     public static final String ERROR_COLOR = "\u001B[31m";
     public static final String WARN_COLOR  = "\u001B[33m";
@@ -72,9 +74,9 @@ public class LoggerConfigurator extends ContextAwareBase implements Configurator
                 builder.append(event.getMarkerList()).append(" ");
             }
             builder.append("[")
-                    .append(event.getThreadName())
-                    .append("] [")
-                    .append(event.getLoggerName().substring(event.getLoggerName().lastIndexOf('.') + 1));
+                   .append(event.getThreadName())
+                   .append("] [")
+                   .append(event.getLoggerName().substring(event.getLoggerName().lastIndexOf('.') + 1));
 
             StackTraceElement datum     = event.getCallerData()[0];
             int               i         = 1;
@@ -98,10 +100,27 @@ public class LoggerConfigurator extends ContextAwareBase implements Configurator
                 builder.append("] ");
             }
 
-            return builder.append(event.getFormattedMessage())
-                          .append(CoreConstants.LINE_SEPARATOR)
-                          .append(RESET_COLOR)
-                          .toString();
+            builder.append(event.getFormattedMessage())
+                   .append(CoreConstants.LINE_SEPARATOR);
+            if (event.getThrowableProxy() != null) {
+                ThrowableProxy throwableProxy = (ThrowableProxy) event.getThrowableProxy();
+                builder.append(throwableProxy.getThrowable().toString())
+                       .append(CoreConstants.LINE_SEPARATOR);
+                for (int j = 0; j < throwableProxy.getStackTraceElementProxyArray().length; j++) {
+                    if (j >= MAX_STACKTRACE_DEPTH) {
+                        builder.append("\t... ")
+                               .append(throwableProxy.getStackTraceElementProxyArray().length - MAX_STACKTRACE_DEPTH)
+                               .append(" more")
+                               .append(CoreConstants.LINE_SEPARATOR);
+                        break;
+                    }
+                    builder.append("\tat ")
+                           .append(throwableProxy.getStackTraceElementProxyArray()[j].getStackTraceElement())
+                           .append(CoreConstants.LINE_SEPARATOR);
+                }
+            }
+
+            return builder.append(RESET_COLOR).toString();
         }
 
         String getLevelColor(Level level) {
