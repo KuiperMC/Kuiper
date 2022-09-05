@@ -70,5 +70,12 @@ public class ServerboundClientInformation extends SimpleClassDescriptor implemen
                                                          new Slot().id(1)
                                                                    .count((byte) 1)))
                                          .result(new Slot().id(2).count((byte) 1))));
+        connection.sendPacket(new ClientboundUpdateTags()
+                                      .block(new ClientboundUpdateTags.Tag("mineable/axe", 10))
+                                      .entityType(new ClientboundUpdateTags.Tag("beehive_inhabitors", 6))
+                                      .fluid(new ClientboundUpdateTags.Tag("lava", 29))
+                                      .gameEvent(new ClientboundUpdateTags.Tag("allay_can_listen", 0))
+                                      .item(new ClientboundUpdateTags.Tag("wool", 0))
+        );
     }
 }
