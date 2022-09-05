@@ -14,6 +14,7 @@ import fr.enimaloc.kuiper.entities.Player;
 import fr.enimaloc.kuiper.network.data.BinaryReader;
 import fr.enimaloc.kuiper.network.data.BinaryWriter;
 import fr.enimaloc.kuiper.network.packet.play.ClientboundLogin;
+import fr.enimaloc.kuiper.network.packet.play.ClientboundCustomPayload;
 import fr.enimaloc.kuiper.objects.Gamemode;
 import fr.enimaloc.kuiper.objects.Identifier;
 import fr.enimaloc.kuiper.utils.VarIntUtils;
@@ -197,6 +198,7 @@ public class Connection implements Runnable {
                                 .dimensionName(Identifier.kuiper("world"))
                                 .viewDistance(2)
                                 .simulationDistance(2));
+        this.sendPacket(ClientboundCustomPayload.brand().data("Kuiper"));
     }
 
     private CompoundTag getRegistryCodec() {
