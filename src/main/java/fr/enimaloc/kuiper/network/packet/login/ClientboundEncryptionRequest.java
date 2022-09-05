@@ -12,7 +12,6 @@ import fr.enimaloc.kuiper.network.Packet;
 import fr.enimaloc.kuiper.network.data.BinaryWriter;
 import fr.enimaloc.kuiper.network.data.SizedStrategy;
 import fr.enimaloc.kuiper.utils.SimpleClassDescriptor;
-import fr.enimaloc.kuiper.utils.VarIntUtils;
 
 /**
  *
@@ -52,10 +51,4 @@ public class ClientboundEncryptionRequest extends SimpleClassDescriptor implemen
         binaryWriter.writeByteArray(this.verifyToken, SizedStrategy.VARINT);
     }
 
-    @Override
-    public int length() {
-        return VarIntUtils.varIntSize(this.serverId.length()) + this.serverId.length()
-                + VarIntUtils.varIntSize(this.publicKey.length) + this.publicKey.length
-                + VarIntUtils.varIntSize(this.verifyToken.length) + this.verifyToken.length;
-    }
 }

@@ -33,8 +33,4 @@ public class ClientboundPongResponsePacket extends SimpleClassDescriptor impleme
         binaryWriter.writeLong(this.payload);
     }
 
-    @Override
-    public int length() {
-        return Long.BYTES;
-    }
 }

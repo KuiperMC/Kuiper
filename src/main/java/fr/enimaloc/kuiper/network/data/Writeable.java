@@ -12,6 +12,4 @@ package fr.enimaloc.kuiper.network.data;
  */
 public interface Writeable {
     void write(BinaryWriter binaryWriter);
-
-    int length();
 }

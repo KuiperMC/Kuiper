@@ -11,7 +11,6 @@ import fr.enimaloc.kuiper.network.Packet;
 import fr.enimaloc.kuiper.network.data.BinaryWriter;
 import fr.enimaloc.kuiper.network.data.SizedStrategy;
 import fr.enimaloc.kuiper.utils.SimpleClassDescriptor;
-import fr.enimaloc.kuiper.utils.VarIntUtils;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -90,11 +89,6 @@ public class ClientboundStatusResponsePacket extends SimpleClassDescriptor imple
     @Override
     public void write(BinaryWriter binaryWriter) {
         binaryWriter.writeString(createJson(), SizedStrategy.VARINT);
-    }
-
-    @Override
-    public int length() {
-        return VarIntUtils.varIntSize(createJson().length()) + createJson().length();
     }
 
     private String createJson() {

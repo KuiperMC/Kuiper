@@ -13,7 +13,6 @@ import fr.enimaloc.kuiper.network.data.BinaryWriter;
 import fr.enimaloc.kuiper.network.data.SizedStrategy;
 import fr.enimaloc.kuiper.network.data.Writeable;
 import fr.enimaloc.kuiper.utils.SimpleClassDescriptor;
-import fr.enimaloc.kuiper.utils.VarIntUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -68,15 +67,6 @@ public class ClientboundLoginSuccess extends SimpleClassDescriptor implements Pa
         writer.writeList(properties, BinaryWriter::write, SizedStrategy.VARINT);
     }
 
-    @Override
-    public int length() {
-        return Long.BYTES * 2
-               + VarIntUtils.varIntSize(username.length()) + username.length()
-               + (properties != null
-                ? VarIntUtils.varIntSize(properties.size()) + properties.stream().mapToInt(Writeable::length).sum()
-                : VarIntUtils.varIntSize(0));
-    }
-
     public record Property(String name, String value, String signature) implements Writeable {
         public Property(String name, String value) {
             this(name, value, null);
@@ -92,12 +82,5 @@ public class ClientboundLoginSuccess extends SimpleClassDescriptor implements Pa
             }
         }
 
-        @Override
-        public int length() {
-            return VarIntUtils.varIntSize(name.length()) + name.length()
-                   + VarIntUtils.varIntSize(value.length()) + value.length()
-                   + Byte.BYTES
-                   + (signature != null ? VarIntUtils.varIntSize(signature.length()) + signature.length() : 0);
-        }
     }
 }

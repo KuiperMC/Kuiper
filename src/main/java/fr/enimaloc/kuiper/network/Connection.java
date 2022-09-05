@@ -126,9 +126,10 @@ public class Connection implements Runnable {
                                                                                                   socket.getInetAddress()
                                                                                                         .getHostAddress(),
                                                                                                   packet);
-        try (BinaryWriter writer = new BinaryWriter(packet.length() + VarIntUtils.varIntSize(packet.id()), false)
-                .writeVarInt(packet.id())
-                .write(packet)) {
+        try (BinaryWriter writer = new BinaryWriter(
+                BinaryWriter.makeArray(packet::write).length
+                + VarIntUtils.varIntSize(packet.id()), false).writeVarInt(packet.id())
+                                                             .write(packet)) {
             byte[] varInt = VarIntUtils.getVarInt(writer.getBuffer().array().length);
             byte[] bytes  = new byte[writer.getBuffer().array().length + varInt.length];
             System.arraycopy(varInt, 0, bytes, 0, varInt.length);
