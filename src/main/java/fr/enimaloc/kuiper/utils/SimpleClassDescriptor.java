@@ -8,6 +8,8 @@
 package fr.enimaloc.kuiper.utils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.StringJoiner;
 
 /**
@@ -18,7 +20,9 @@ class SimpleClassDescriptor {
     @Override
     public String toString() {
         StringJoiner joiner = new StringJoiner(", ", getClass().getSimpleName() + "{", "}");
-        for (Field field : getClass().getDeclaredFields()) {
+        for (Field field : Arrays.stream(getClass().getDeclaredFields())
+                                 .filter(f -> !Modifier.isStatic(f.getModifiers()))
+                                 .toList()) {
             try {
                 joiner.add(field.getName()
                            + (field.getDeclaringClass() == String.class ? "='" : "=")
