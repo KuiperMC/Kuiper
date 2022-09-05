@@ -104,5 +104,6 @@ public class ServerboundClientInformation extends SimpleClassDescriptor implemen
                                                               0,
                                                               null));
         connection.sendPacket(new ClientboundPlayerInfo().updateLatency(connection.player.uuid(), 100));
+        connection.sendPacket(new ClientboundSetCenterChunk().x(0).z(0));
     }
 }
