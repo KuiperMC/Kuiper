@@ -62,6 +62,7 @@ public interface Packet {
         CLIENTBOUND_CHANGE_DIFFICULTY(Type.CLIENTBOUND, 0x0B, GameState.PLAY),
         SERVERBOUND_CUSTOM_PAYLOAD(Type.SERVERBOUND, 0x0C, GameState.PLAY, ServerboundCustomPayload::new),
         CLIENTBOUND_COMMANDS(Type.CLIENTBOUND, 0x0F, GameState.PLAY),
+        SERVERBOUND_SET_PLAYER_POSITION(Type.SERVERBOUND, 0x13, GameState.PLAY, ServerboundSetPlayerPosition::new),
         SERVERBOUND_MOVE_PLAYER(Type.SERVERBOUND, 0x14, GameState.PLAY, ServerboundMovePlayer::new),
         CLIENTBOUND_CUSTOM_PAYLOAD(Type.CLIENTBOUND, 0x15, GameState.PLAY),
         CLIENTBOUND_ENTITY_EVENT(Type.CLIENTBOUND, 0x18, GameState.PLAY),
