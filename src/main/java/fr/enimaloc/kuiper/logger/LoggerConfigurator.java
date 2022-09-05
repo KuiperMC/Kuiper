@@ -25,7 +25,9 @@ import java.nio.charset.StandardCharsets;
  *
  */
 public class LoggerConfigurator extends ContextAwareBase implements Configurator {
+    public static final boolean REDUCED               = false;
     public static final boolean DISPLAY_IF_NOT_SOURCE = false;
+    public static final boolean DISPLAY_SOURCE        = false;
     public static final int     MAX_STACKTRACE_DEPTH  = 10;
 
     public static final String ERROR_COLOR = "\u001B[31m";
@@ -67,35 +69,44 @@ public class LoggerConfigurator extends ContextAwareBase implements Configurator
                     .append(getLevelColor(event.getLevel()))
                     .append("[")
                     .append(new CachingDateFormatter(CoreConstants.ISO8601_PATTERN).format(event.getTimeStamp()))
-                    .append("] [")
-                    .append(event.getLevel())
                     .append("] ");
-            if (event.getMarkerList() != null) {
-                builder.append(event.getMarkerList()).append(" ");
+            if (!REDUCED) {
+                builder.append("[")
+                       .append(event.getLevel())
+                       .append("] ");
+                if (event.getMarkerList() != null) {
+                    builder.append(event.getMarkerList()).append(" ");
+                }
+                builder.append("[")
+                       .append(event.getThreadName())
+                       .append("] ");
             }
             builder.append("[")
-                   .append(event.getThreadName())
-                   .append("] [")
                    .append(event.getLoggerName().substring(event.getLoggerName().lastIndexOf('.') + 1));
 
-            StackTraceElement datum     = event.getCallerData()[0];
-            int               i         = 1;
-            boolean           isLogging = datum.getMethodName().startsWith("log");
-            while (datum.getClassName().startsWith("uk.org.lidalia.sysoutslf4j") && isLogging) {
-                datum = event.getCallerData()[i++];
-            }
+            if (DISPLAY_SOURCE && !REDUCED) {
+                StackTraceElement datum     = event.getCallerData()[0];
+                int               i         = 1;
+                boolean           isLogging = datum.getMethodName().startsWith("log");
+                while (datum.getClassName().startsWith("uk.org.lidalia.sysoutslf4j") && isLogging) {
+                    datum = event.getCallerData()[i++];
+                }
 
-            if (datum.isNativeMethod() && DISPLAY_IF_NOT_SOURCE) {
-                builder.append(" - Native Method] ");
-            } else if (DISPLAY_IF_NOT_SOURCE || datum.getClassName().startsWith("fr.enimaloc")) {
-                builder.append(" - ").append(datum.getClassName().substring(datum.getClassName().lastIndexOf('.') + 1))
-                       .append(".")
-                       .append(datum.getMethodName())
-                       .append("(")
-                       .append(datum.getFileName())
-                       .append(":")
-                       .append(datum.getLineNumber())
-                       .append(")] ");
+                if (datum.isNativeMethod() && DISPLAY_IF_NOT_SOURCE) {
+                    builder.append(" - Native Method] ");
+                } else if (DISPLAY_IF_NOT_SOURCE || datum.getClassName().startsWith("fr.enimaloc")) {
+                    builder.append(" - ").append(
+                                   datum.getClassName().substring(datum.getClassName().lastIndexOf('.') + 1))
+                           .append(".")
+                           .append(datum.getMethodName())
+                           .append("(")
+                           .append(datum.getFileName())
+                           .append(":")
+                           .append(datum.getLineNumber())
+                           .append(")] ");
+                } else {
+                    builder.append("] ");
+                }
             } else {
                 builder.append("] ");
             }
