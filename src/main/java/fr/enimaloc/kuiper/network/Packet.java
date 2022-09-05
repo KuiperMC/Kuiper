@@ -59,6 +59,7 @@ public interface Packet {
 
         SERVERBOUND_CLIENT_INFORMATION(Type.SERVERBOUND, 0x07, GameState.PLAY, ServerboundClientInformation::new),
         CLIENTBOUND_CHANGE_DIFFICULTY(Type.CLIENTBOUND, 0x0B, GameState.PLAY),
+        SERVERBOUND_CUSTOM_PAYLOAD(Type.SERVERBOUND, 0x0C, GameState.PLAY, ServerboundCustomPayload::new),
         CLIENTBOUND_CUSTOM_PAYLOAD(Type.CLIENTBOUND, 0x15, GameState.PLAY),
         CLIENTBOUND_LOGIN(Type.CLIENTBOUND, 0x23, GameState.PLAY),
         CLIENTBOUND_PLAYER_ABILITIES(Type.CLIENTBOUND, 0x2F, GameState.PLAY),

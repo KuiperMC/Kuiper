@@ -25,6 +25,7 @@ public class Player {
     public boolean rightMainHand;
     public boolean textFiltering;
     public boolean serverListing;
+    public String brand;
     private String name;
     private UUID   uuid;
     public final Connection connection;
