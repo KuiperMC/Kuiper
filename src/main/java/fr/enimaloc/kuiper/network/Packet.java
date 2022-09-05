@@ -52,7 +52,14 @@ public interface Packet {
 
         LOGIN_START(Type.SERVERBOUND, 0x00, GameState.LOGIN, ServerboundLoginStart::new),
         ENCRYPTION_REQUEST(Type.CLIENTBOUND, 0x01, GameState.LOGIN),
-        ENCRYPTION_RESPONSE(Type.SERVERBOUND, 0x001, GameState.LOGIN, ServerboundEncryptionResponse::new),
+        ENCRYPTION_RESPONSE(Type.SERVERBOUND, 0x01, GameState.LOGIN, ServerboundEncryptionResponse::new),
+        SET_COMPRESSION(Type.CLIENTBOUND, 0x03, GameState.LOGIN),
+        LOGIN_SUCCESS(Type.CLIENTBOUND, 0x02, GameState.LOGIN),
+
+        CHANGE_DIFFICULTY(Type.CLIENTBOUND, 0x0B, GameState.PLAY),
+        CUSTOM_PAYLOAD(Type.CLIENTBOUND, 0x15, GameState.PLAY),
+        LOGIN(Type.CLIENTBOUND, 0x23, GameState.PLAY),
+        PLAYER_ABILITIES(Type.CLIENTBOUND, 0x2F, GameState.PLAY),
         ;
 
         public final GameState                                state;
