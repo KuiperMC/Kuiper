@@ -12,6 +12,7 @@ import fr.enimaloc.kuiper.exception.PacketNotFoundException;
 import fr.enimaloc.kuiper.network.data.BinaryReader;
 import fr.enimaloc.kuiper.network.data.Writeable;
 import fr.enimaloc.kuiper.network.packet.login.*;
+import fr.enimaloc.kuiper.network.packet.play.ServerboundClientInformation;
 import fr.enimaloc.kuiper.network.packet.status.*;
 import fr.enimaloc.kuiper.network.packet.unknown.*;
 import java.util.Arrays;
@@ -56,6 +57,7 @@ public interface Packet {
         SET_COMPRESSION(Type.CLIENTBOUND, 0x03, GameState.LOGIN),
         LOGIN_SUCCESS(Type.CLIENTBOUND, 0x02, GameState.LOGIN),
 
+        CLIENT_INFORMATION(Type.SERVERBOUND, 0x07, GameState.PLAY, ServerboundClientInformation::new),
         CHANGE_DIFFICULTY(Type.CLIENTBOUND, 0x0B, GameState.PLAY),
         CUSTOM_PAYLOAD(Type.CLIENTBOUND, 0x15, GameState.PLAY),
         LOGIN(Type.CLIENTBOUND, 0x23, GameState.PLAY),

@@ -7,7 +7,9 @@
  */
 package fr.enimaloc.kuiper.entities;
 
+import fr.enimaloc.kuiper.chat.ChatMode;
 import fr.enimaloc.kuiper.network.Connection;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -15,6 +17,14 @@ import java.util.UUID;
  */
 public class Player {
 
+    public Locale locale;
+    public byte viewDistance;
+    public ChatMode chatMode;
+    public boolean chatColors;
+    public byte displayedSkinParts;
+    public boolean rightMainHand;
+    public boolean textFiltering;
+    public boolean serverListing;
     private String name;
     private UUID   uuid;
     public final Connection connection;
