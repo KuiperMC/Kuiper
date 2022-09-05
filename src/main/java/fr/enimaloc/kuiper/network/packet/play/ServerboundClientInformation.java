@@ -13,6 +13,8 @@ import fr.enimaloc.kuiper.network.Connection;
 import fr.enimaloc.kuiper.network.Packet;
 import fr.enimaloc.kuiper.network.data.BinaryReader;
 import fr.enimaloc.kuiper.network.data.SizedStrategy;
+import fr.enimaloc.kuiper.objects.Identifier;
+import fr.enimaloc.kuiper.objects.Slot;
 import fr.enimaloc.kuiper.utils.SimpleClassDescriptor;
 import java.util.Locale;
 
@@ -58,5 +60,15 @@ public class ServerboundClientInformation extends SimpleClassDescriptor implemen
         player.textFiltering = textFiltering;
         player.serverListing = serverListing;
         connection.sendPacket(new ClientboundSetCarriedItem().slot((byte) 4));
+        connection.sendPacket(
+                new ClientboundUpdateRecipe()
+                        .recipes(new ClientboundUpdateRecipe.Recipe
+                                .CraftingShapeless(Identifier.kuiper("test"))
+                                         .group(Identifier.kuiper("group_test"))
+                                         .addIngredient(
+                                                 new ClientboundUpdateRecipe.Recipe.Ingredient(
+                                                         new Slot().id(1)
+                                                                   .count((byte) 1)))
+                                         .result(new Slot().id(2).count((byte) 1))));
     }
 }

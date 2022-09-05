@@ -65,6 +65,7 @@ public interface Packet {
         SERVERBOUND_SET_CARRIED_ITEM(Type.SERVERBOUND, 0x27, GameState.PLAY, ServerboundSetCarriedItem::new),
         CLIENTBOUND_PLAYER_ABILITIES(Type.CLIENTBOUND, 0x2F, GameState.PLAY),
         CLIENTBOUND_SET_CARRIED_ITEM(Type.CLIENTBOUND, 0x47, GameState.PLAY),
+        CLIENTBOUND_UPDATE_RECIPES(Type.CLIENTBOUND, 0x67, GameState.PLAY),
         ;
 
         public final GameState                                state;
