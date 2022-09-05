@@ -43,8 +43,29 @@ public record Dimension(Identifier name,
             1D,
             false,
             false);
+    public static final Dimension THE_NETHER = new Dimension(
+            Identifier.minecraft("the_nether"),
+            true,
+            false,
+            11,
+            15,
+            false,
+            0.1f,
+            Optional.of(18000f),
+            Optional.of(Identifier.minecraft("infiniburn_nether")),
+            true,
+            false,
+            false,
+            Identifier.minecraft("the_nether"),
+            0,
+            256,
+            128,
+            8.0d,
+            true,
+            true
+    );
 
     public static Dimension[] values() {
-        return new Dimension[]{WORLD};
+        return new Dimension[]{OVERWORLD, THE_NETHER};
     }
 }
