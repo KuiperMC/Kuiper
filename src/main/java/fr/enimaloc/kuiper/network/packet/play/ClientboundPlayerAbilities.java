@@ -38,6 +38,9 @@ public class ClientboundPlayerAbilities extends SimpleClassDescriptor implements
         return this;
     }
 
+    // FIXME: 05/09/2022 When active player stuck in "Loading terrain..." screen
+    //  fix for removing @Deprecated
+    @Deprecated
     public ClientboundPlayerAbilities flying(boolean flying) {
         this.flying = flying;
         return this;
@@ -64,20 +67,10 @@ public class ClientboundPlayerAbilities extends SimpleClassDescriptor implements
     }
 
     public byte flags() {
-        byte flags = 0;
-        if (invulnerable) {
-            flags |= INVULNERABLE;
-        }
-        if (flying) {
-            flags |= FLYING;
-        }
-        if (allowFlying) {
-            flags |= ALLOW_FLYING;
-        }
-        if (creativeMode) {
-            flags |= INSTANT_BREAK;
-        }
-        return flags;
+        return (byte) ((invulnerable ? INVULNERABLE : 0x00)
+                       | (flying ? FLYING : 0x00)
+                       | (allowFlying ? ALLOW_FLYING : 0x00)
+                       | (creativeMode ? INSTANT_BREAK : 0x00));
     }
 
     @Override

@@ -13,10 +13,7 @@ import fr.enimaloc.kuiper.MinecraftServer;
 import fr.enimaloc.kuiper.entities.Player;
 import fr.enimaloc.kuiper.network.data.BinaryReader;
 import fr.enimaloc.kuiper.network.data.BinaryWriter;
-import fr.enimaloc.kuiper.network.packet.play.ClientboundChangeDifficulty;
-import fr.enimaloc.kuiper.network.packet.play.ClientboundLogin;
-import fr.enimaloc.kuiper.network.packet.play.ClientboundCustomPayload;
-import fr.enimaloc.kuiper.network.packet.play.ClientboundPlayerAbilities;
+import fr.enimaloc.kuiper.network.packet.play.*;
 import fr.enimaloc.kuiper.network.packet.unknown.ServerboundHandshake;
 import fr.enimaloc.kuiper.objects.Gamemode;
 import fr.enimaloc.kuiper.objects.Identifier;
@@ -24,6 +21,7 @@ import fr.enimaloc.kuiper.utils.VarIntUtils;
 import fr.enimaloc.kuiper.world.Biome;
 import fr.enimaloc.kuiper.world.Difficulty;
 import fr.enimaloc.kuiper.world.Dimension;
+import fr.enimaloc.kuiper.world.Location;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -201,18 +199,21 @@ public class Connection implements Runnable {
     public void beginPlayState() {
         this.gameState = GameState.PLAY;
         this.sendPacket(new ClientboundLogin().entityId(0)
-                                .gamemode(Gamemode.CREATIVE)
-                                .previousGamemode(Gamemode.CREATIVE)
-                                .dimensions(Identifier.minecraft("overworld"))
-                                .registry(getRegistryCodec())
-                                .dimensionType(Identifier.minecraft("overworld"))
-                                .dimensionName(Identifier.minecraft("world"))
-                                .viewDistance(2)
-                                .simulationDistance(2)
-                                .debug(true));
+                                              .gamemode(Gamemode.CREATIVE)
+                                              .previousGamemode(Gamemode.CREATIVE)
+                                              .dimensions(Identifier.minecraft("overworld"))
+                                              .registry(getRegistryCodec())
+                                              .dimensionType(Identifier.minecraft("overworld"))
+                                              .dimensionName(Identifier.minecraft("world"))
+                                              .viewDistance(2)
+                                              .simulationDistance(2)
+                                              .debug(true));
+        this.sendPacket(new ClientboundSynchronizePosition().position(new Location.Position(0, 0, 0))
+                                                            .yaw(0f)
+                                                            .pitch(0f));
         this.sendPacket(ClientboundCustomPayload.brand().data("Kuiper"));
         this.sendPacket(new ClientboundChangeDifficulty().difficulty(Difficulty.PEACEFUL).locked(false));
-        this.sendPacket(new ClientboundPlayerAbilities().flying(true));
+        this.sendPacket(new ClientboundPlayerAbilities().allowFlying(true).creativeMode(true).invulnerable(true));
     }
 
     private CompoundTag getRegistryCodec() {
@@ -317,31 +318,31 @@ public class Connection implements Runnable {
         registryCodec.put("minecraft:worldgen/biome", biomeRegistry);
         try {
             registryCodec.put("minecraft:chat_type", SNBTUtil.fromSNBT("""
-                                                                                   {
-                                                                                       "type": "minecraft:chat_type",
-                                                                                       "value": [
-                                                                                            {
-                                                                                               "name":"minecraft:chat",
-                                                                                               "id":1,
-                                                                                               "element":{
-                                                                                                  "chat":{
-                                                                                                     "translation_key":"chat.type.text",
-                                                                                                     "parameters":[
-                                                                                                        "sender",
-                                                                                                        "content"
-                                                                                                     ]
-                                                                                                  },
-                                                                                                  "narration":{
-                                                                                                     "translation_key":"chat.type.text.narrate",
-                                                                                                     "parameters":[
-                                                                                                        "sender",
-                                                                                                        "content"
-                                                                                                     ]
-                                                                                                  }
-                                                                                               }
-                                                                                            }
-                                                                                       ]
-                                                                                   }"""));
+                                                                               {
+                                                                                   "type": "minecraft:chat_type",
+                                                                                   "value": [
+                                                                                        {
+                                                                                           "name":"minecraft:chat",
+                                                                                           "id":1,
+                                                                                           "element":{
+                                                                                              "chat":{
+                                                                                                 "translation_key":"chat.type.text",
+                                                                                                 "parameters":[
+                                                                                                    "sender",
+                                                                                                    "content"
+                                                                                                 ]
+                                                                                              },
+                                                                                              "narration":{
+                                                                                                 "translation_key":"chat.type.text.narrate",
+                                                                                                 "parameters":[
+                                                                                                    "sender",
+                                                                                                    "content"
+                                                                                                 ]
+                                                                                              }
+                                                                                           }
+                                                                                        }
+                                                                                   ]
+                                                                               }"""));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

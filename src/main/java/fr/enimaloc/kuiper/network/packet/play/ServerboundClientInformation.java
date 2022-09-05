@@ -21,7 +21,8 @@ import fr.enimaloc.kuiper.world.Location;
 import java.util.Locale;
 import org.slf4j.event.Level;
 
-import static fr.enimaloc.kuiper.MinecraftServer.Markers.*;
+import static fr.enimaloc.kuiper.MinecraftServer.Markers.NETWORK;
+import static fr.enimaloc.kuiper.MinecraftServer.Markers.NETWORK_OUT;
 
 /**
  *
@@ -102,6 +103,7 @@ public class ServerboundClientInformation extends SimpleClassDescriptor implemen
                                       .item(new ClientboundUpdateTags.Tag("coals", 263, 173)));
         connection.sendPacket(new ClientboundEntityEvent().entityId(0).status(Player.Status.OP_LEVEL_4));
         connection.sendPacket(new ClientboundCommandsPacket());
+        connection.sendPacket(new ClientboundRecipes());
         connection.sendPacket(new ClientboundPlayerInfo().add(connection.player.uuid(),
                                                               connection.player.name(),
                                                               Gamemode.CREATIVE,
