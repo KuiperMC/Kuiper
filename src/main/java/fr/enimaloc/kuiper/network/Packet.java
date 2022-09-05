@@ -62,6 +62,7 @@ public interface Packet {
         SERVERBOUND_CUSTOM_PAYLOAD(Type.SERVERBOUND, 0x0C, GameState.PLAY, ServerboundCustomPayload::new),
         CLIENTBOUND_CUSTOM_PAYLOAD(Type.CLIENTBOUND, 0x15, GameState.PLAY),
         CLIENTBOUND_LOGIN(Type.CLIENTBOUND, 0x23, GameState.PLAY),
+        SERVERBOUND_SET_CARRIED_ITEM(Type.SERVERBOUND, 0x27, GameState.PLAY, ServerboundSetCarriedItem::new),
         CLIENTBOUND_PLAYER_ABILITIES(Type.CLIENTBOUND, 0x2F, GameState.PLAY),
         CLIENTBOUND_SET_CARRIED_ITEM(Type.CLIENTBOUND, 0x47, GameState.PLAY),
         ;
