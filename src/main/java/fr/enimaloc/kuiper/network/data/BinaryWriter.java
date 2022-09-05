@@ -176,6 +176,18 @@ public class BinaryWriter extends OutputStream {
         return this;
     }
 
+    public BinaryWriter writeLongArray(long[] array, SizedStrategy strategy) {
+        if (array == null) {
+            strategy.writer.accept(0, this);
+            return this;
+        }
+        strategy.writer.accept(array.length, this);
+        for (long l : array) {
+            writeLong(l);
+        }
+        return this;
+    }
+
     public BinaryWriter writeByteArray(byte[] array, SizedStrategy strategy) {
         if (array == null) {
             strategy.writer.accept(0, this);
