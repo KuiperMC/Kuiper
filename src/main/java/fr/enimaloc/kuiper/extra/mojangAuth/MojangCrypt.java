@@ -58,7 +58,7 @@ public class MojangCrypt {
     }
 
     public static byte[] decryptUsingKey(Key key, byte[] bytes) {
-        return cipherData(2, key, bytes);
+        return cipherData(Cipher.DECRYPT_MODE, key, bytes);
     }
 
     private static byte[] cipherData(int mode, Key key, byte[] data) {
