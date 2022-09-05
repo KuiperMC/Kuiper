@@ -13,9 +13,15 @@ import fr.enimaloc.kuiper.MinecraftServer;
 import fr.enimaloc.kuiper.entities.Player;
 import fr.enimaloc.kuiper.network.data.BinaryReader;
 import fr.enimaloc.kuiper.network.data.BinaryWriter;
+import fr.enimaloc.kuiper.network.packet.play.ClientboundLogin;
+import fr.enimaloc.kuiper.objects.Gamemode;
+import fr.enimaloc.kuiper.objects.Identifier;
 import fr.enimaloc.kuiper.utils.VarIntUtils;
+import fr.enimaloc.kuiper.world.Biome;
+import fr.enimaloc.kuiper.world.Dimension;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -24,6 +30,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import net.querz.nbt.io.SNBTUtil;
+import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.ListTag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;
@@ -175,5 +184,184 @@ public class Connection implements Runnable {
 
     public InetAddress getRemoteAddress() {
         return socket.getInetAddress();
+    }
+
+    public void beginPlayState() {
+        this.gameState = GameState.PLAY;
+        this.sendPacket(new ClientboundLogin().entityId(0)
+                                .gamemode(Gamemode.CREATIVE)
+                                .previousGamemode(Gamemode.CREATIVE)
+                                .dimensions(Identifier.kuiper("world"))
+                                .registry(getRegistryCodec())
+                                .dimensionType(Identifier.minecraft("overworld"))
+                                .dimensionName(Identifier.kuiper("world"))
+                                .viewDistance(2)
+                                .simulationDistance(2));
+    }
+
+    private CompoundTag getRegistryCodec() {
+
+        CompoundTag registryCodec = new CompoundTag();
+
+        AtomicInteger id                = new AtomicInteger(0);
+        CompoundTag   dimensionRegistry = new CompoundTag();
+        dimensionRegistry.putString("type", "minecraft:dimension_type");
+
+        ListTag<CompoundTag> dimensionList = new ListTag<>(CompoundTag.class);
+        for (Dimension spec : Dimension.values()) {
+            if (spec == null) {
+                continue;
+            }
+            CompoundTag identifierTag = new CompoundTag();
+            identifierTag.putString("name", spec.name().toString());
+            identifierTag.putInt("id", id.getAndIncrement());
+
+            CompoundTag specTag = new CompoundTag();
+            specTag.putBoolean("piglin_safe", spec.piglinSafe());
+            specTag.putBoolean("has_raids", spec.hasRaids());
+            {
+                CompoundTag monsterSpawnLightLevel = new CompoundTag();
+                monsterSpawnLightLevel.putString("type", "minecraft:uniform");
+                CompoundTag monsterSpawnLightLevelValue = new CompoundTag();
+                monsterSpawnLightLevelValue.putDouble("min_inclusive", 0);
+                monsterSpawnLightLevelValue.putDouble("max_inclusive", spec.monsterSpawnLightLevel());
+                monsterSpawnLightLevel.put("value", monsterSpawnLightLevelValue);
+                specTag.put("monster_spawn_light_level", monsterSpawnLightLevel);
+            }
+            specTag.putInt("monster_spawn_block_light_limit", spec.monsterSpawnBlockLightLimit());
+            specTag.putBoolean("natural", spec.natural());
+            specTag.putFloat("ambient_light", spec.ambientLight());
+            spec.fixedTime().ifPresent(fixedTime -> specTag.putFloat("fixed_time", fixedTime));
+            specTag.putString("infiniburn", "#" + spec.infiniburn().map(Identifier::toString).orElse(""));
+            specTag.putBoolean("respawn_anchor_works", spec.respawnAnchorWorks());
+            specTag.putBoolean("has_skylight", spec.skyLight());
+            specTag.putBoolean("bed_works", spec.bedWorks());
+            specTag.putString("effects", spec.effects().toString());
+            specTag.putInt("min_y", spec.minY());
+            specTag.putInt("height", spec.height());
+            specTag.putInt("logical_height", spec.logicalHeight());
+            specTag.putDouble("coordinate_scale", spec.coordinateScale());
+            specTag.putBoolean("ultrawarm", spec.ultrawarm());
+            specTag.putBoolean("has_ceiling", spec.ceiling());
+
+            identifierTag.put("element", specTag);
+
+            dimensionList.add(identifierTag);
+        }
+        dimensionRegistry.put("value", dimensionList);
+        registryCodec.put("minecraft:dimension_type", dimensionRegistry);
+
+        id.set(0);
+        CompoundTag          biomeRegistry = new CompoundTag();
+        ListTag<CompoundTag> biomeList     = new ListTag<>(CompoundTag.class);
+        biomeRegistry.putString("type", "minecraft:worldgen/biome");
+
+        for (Biome spec : Biome.values()) {
+            if (spec == null) {
+                continue;
+            }
+            CompoundTag identifierTag = new CompoundTag();
+            identifierTag.putString("name", spec.name().toString());
+            identifierTag.putInt("id", id.getAndIncrement());
+
+            CompoundTag specTag = new CompoundTag();
+            specTag.putString("precipitation", spec.precipitation().orElse("none"));
+            specTag.putFloat("depth", spec.depth());
+            specTag.putFloat("temperature", spec.temperature());
+            specTag.putFloat("scale", spec.scale());
+            specTag.putFloat("downfall", spec.downfall());
+            spec.category().ifPresent(category -> specTag.putString("category", category));
+            spec.temperatureModifier().ifPresent(
+                    temperatureModifier -> specTag.putString("temperature_modifier", temperatureModifier));
+            {
+                CompoundTag effectTag = new CompoundTag();
+                effectTag.putInt("sky_color", spec.skyColor());
+                effectTag.putInt("water_fog_color", spec.waterFogColor());
+                effectTag.putInt("water_color", spec.waterColor());
+                effectTag.putInt("fog_color", spec.fogColor());
+                spec.foliageColor().ifPresent(foliageColor -> effectTag.putInt("foliage_color", foliageColor));
+                spec.grassColor().ifPresent(grassColor -> effectTag.putInt("grass_color", grassColor));
+                spec.grassColorModifier().ifPresent(
+                        grassColorModifier -> effectTag.putString("grass_color_modifier", grassColorModifier));
+                {
+                    CompoundTag moodSoundTag = new CompoundTag();
+                    moodSoundTag.putString("sound", spec.moodSound().name().toString());
+                    moodSoundTag.putFloat("offset", spec.moodSound().offset());
+                    moodSoundTag.putInt("block_search_extent", spec.moodSound().blockSearchExtent());
+                    moodSoundTag.putLong("tick_delay", spec.moodSound().tickDelay());
+                    effectTag.put("mood_sound", moodSoundTag);
+                }
+                specTag.put("effects", effectTag);
+            }
+
+            identifierTag.put("element", specTag);
+            biomeList.add(identifierTag);
+        }
+        biomeRegistry.put("value", biomeList);
+        registryCodec.put("minecraft:worldgen/biome", biomeRegistry);
+        try {
+            registryCodec.put("minecraft:chat_type", SNBTUtil.fromSNBT("""
+                                                                                   {
+                                                                                       "type": "minecraft:chat_type",
+                                                                                       "value": [
+                                                                                            {
+                                                                                               "name":"minecraft:chat",
+                                                                                               "id":1,
+                                                                                               "element":{
+                                                                                                  "chat":{
+                                                                                                     "translation_key":"chat.type.text",
+                                                                                                     "parameters":[
+                                                                                                        "sender",
+                                                                                                        "content"
+                                                                                                     ]
+                                                                                                  },
+                                                                                                  "narration":{
+                                                                                                     "translation_key":"chat.type.text.narrate",
+                                                                                                     "parameters":[
+                                                                                                        "sender",
+                                                                                                        "content"
+                                                                                                     ]
+                                                                                                  }
+                                                                                               }
+                                                                                            }
+                                                                                       ]
+                                                                                   }"""));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+
+        CompoundTag chatTag = new CompoundTag();
+        CompoundTag system = new CompoundTag();/*.writeCompound("chat", new Tag())
+                                  .writeCompound("narration", new Tag().writeString("priority", "system"));*/
+        system.put("chat", new CompoundTag());
+        CompoundTag narration = new CompoundTag();
+        narration.putString("priority", "system");
+        system.put("narration", narration);
+        CompoundTag gameInfo = new CompoundTag();//.writeCompound("overlay", new Tag());
+        gameInfo.put("overlay", new CompoundTag());
+        chatTag.putString("type", "minecraft:chat_type");
+//            chatTag.
+//                   .writeList("value", Tag.Type.COMPOUND, Arrays.asList(
+//                           new Tag().writeCompound("element", system)
+//                                   .writeString("name", "minecraft:system")
+//                                   .writeInt("id", 0),
+//                           new Tag().writeCompound("element",  gameInfo)
+//                                   .writeString("name", "minecraft:game_info")
+//                                   .writeInt("id", 1)));
+        ListTag<CompoundTag> chatList = new ListTag<>(CompoundTag.class);
+        CompoundTag          system1  = new CompoundTag();
+        system1.put("element", system);
+        system1.putString("name", "minecraft:system");
+        system1.putInt("id", 0);
+        chatList.add(system1);
+        CompoundTag gameInfo1 = new CompoundTag();
+        gameInfo1.put("element", gameInfo);
+        gameInfo1.putString("name", "minecraft:game_info");
+        gameInfo1.putInt("id", 1);
+        chatList.add(gameInfo1);
+        chatTag.put("value", chatList);
+        registryCodec.put("minecraft:chat_type", chatTag);
+
+        return registryCodec;
     }
 }

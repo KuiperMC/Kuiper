@@ -9,7 +9,6 @@ package fr.enimaloc.kuiper.network.packet.login;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import fr.enimaloc.kuiper.GameState;
 import fr.enimaloc.kuiper.MinecraftServer;
 import fr.enimaloc.kuiper.extra.MojangAuth;
 import fr.enimaloc.kuiper.extra.mojangAuth.MojangCrypt;
@@ -104,7 +103,7 @@ public class ServerboundEncryptionResponse extends SimpleClassDescriptor impleme
             MinecraftServer.LOGGER.info(AUTH, "Player {} logged with UUID {} and authentified by Mojang server.",
                                         connection.player.name(), connection.player.uuid());
             connection.sendPacket(new ClientboundLoginSuccess().player(connection.player));
-            connection.gameState = GameState.PLAY;
+            connection.beginPlayState();
         });
     }
 

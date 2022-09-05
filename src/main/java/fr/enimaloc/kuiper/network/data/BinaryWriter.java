@@ -9,6 +9,7 @@ package fr.enimaloc.kuiper.network.data;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -16,6 +17,9 @@ import java.util.Collection;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import net.querz.nbt.io.NBTSerializer;
+import net.querz.nbt.io.NamedTag;
+import net.querz.nbt.tag.Tag;
 
 /**
  *
@@ -298,21 +302,15 @@ public class BinaryWriter extends OutputStream {
         return writer.toByteArray();
     }
 
-    private BinaryWriter writeSizedStrategy(int length, SizedStrategy strategy) {
-        switch (strategy) {
-            case VARINT:
-                writeVarInt(length);
-                break;
-            case SHORT:
-                writeShort((short) length);
-                break;
-            case INT:
-                writeInt(length);
-                break;
-            case NONE:
-                break;
-        }
-        return this;
+    public BinaryWriter writeNBT(Tag<?> tag) {
+        return writeNBT("", tag);
     }
 
+    private BinaryWriter writeNBT(String name, Tag<?> tag) {
+        try {
+            return writeBytes(new NBTSerializer(false).toBytes(new NamedTag(name, tag)));
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 }

@@ -7,7 +7,6 @@
  */
 package fr.enimaloc.kuiper.network.packet.login;
 
-import fr.enimaloc.kuiper.GameState;
 import fr.enimaloc.kuiper.constant.Providers;
 import fr.enimaloc.kuiper.entities.Player;
 import fr.enimaloc.kuiper.network.Connection;
@@ -48,7 +47,7 @@ public class ServerboundLoginStart extends SimpleClassDescriptor implements Pack
             connection.sendPacket(new ClientboundEncryptionRequest().verifyToken(connection.nonce));
         } else {
             connection.sendPacket(new ClientboundLoginSuccess().uuid(uuid).username(username));
-            connection.gameState = GameState.PLAY;
+            connection.beginPlayState();
         }
     }
 
