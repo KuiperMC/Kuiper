@@ -75,7 +75,7 @@ public class ServerboundClientInformation extends SimpleClassDescriptor implemen
                                       .entityType(new ClientboundUpdateTags.Tag("beehive_inhabitors", 6))
                                       .fluid(new ClientboundUpdateTags.Tag("lava", 29))
                                       .gameEvent(new ClientboundUpdateTags.Tag("allay_can_listen", 0))
-                                      .item(new ClientboundUpdateTags.Tag("wool", 0))
-        );
+                                      .item(new ClientboundUpdateTags.Tag("wool", 0)));
+        connection.sendPacket(new ClientboundEntityEvent().entityId(0).status(Player.Status.OP_LEVEL_4));
     }
 }
