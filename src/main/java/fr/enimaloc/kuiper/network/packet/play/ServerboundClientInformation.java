@@ -13,6 +13,7 @@ import fr.enimaloc.kuiper.network.Connection;
 import fr.enimaloc.kuiper.network.Packet;
 import fr.enimaloc.kuiper.network.data.BinaryReader;
 import fr.enimaloc.kuiper.network.data.SizedStrategy;
+import fr.enimaloc.kuiper.objects.Gamemode;
 import fr.enimaloc.kuiper.objects.Identifier;
 import fr.enimaloc.kuiper.objects.Slot;
 import fr.enimaloc.kuiper.utils.SimpleClassDescriptor;
@@ -77,5 +78,11 @@ public class ServerboundClientInformation extends SimpleClassDescriptor implemen
                                       .gameEvent(new ClientboundUpdateTags.Tag("allay_can_listen", 0))
                                       .item(new ClientboundUpdateTags.Tag("wool", 0)));
         connection.sendPacket(new ClientboundEntityEvent().entityId(0).status(Player.Status.OP_LEVEL_4));
+        connection.sendPacket(new ClientboundPlayerInfo().add(connection.player.uuid(),
+                                                              connection.player.name(),
+                                                              Gamemode.CREATIVE,
+                                                              0,
+                                                              null));
+        connection.sendPacket(new ClientboundPlayerInfo().updateLatency(connection.player.uuid(), 100));
     }
 }
