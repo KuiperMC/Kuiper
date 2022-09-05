@@ -24,7 +24,7 @@ public record Dimension(Identifier name,
                         boolean ultrawarm, boolean ceiling) {
 
     public static final Dimension WORLD = new Dimension(
-            Identifier.kuiper("world"),
+            Identifier.minecraft("overworld"),
             false,
             true,
             7,
