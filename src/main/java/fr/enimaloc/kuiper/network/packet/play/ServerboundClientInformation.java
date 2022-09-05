@@ -17,6 +17,7 @@ import fr.enimaloc.kuiper.objects.Gamemode;
 import fr.enimaloc.kuiper.utils.SimpleClassDescriptor;
 import fr.enimaloc.kuiper.world.Chunk;
 import fr.enimaloc.kuiper.world.ChunkSection;
+import fr.enimaloc.kuiper.world.Location;
 import java.util.Locale;
 import org.slf4j.event.Level;
 
@@ -125,5 +126,11 @@ public class ServerboundClientInformation extends SimpleClassDescriptor implemen
                          .addMarker(NETWORK)
                          .addMarker(NETWORK_OUT)
                          .log("Sent {}x{} chunks for a total of {} chunks", i1, i2, i1 * i2);
+        connection.sendPacket(new ClientboundInitializeBorder().center(new Location.Position(0, 0, 0))
+                                                               .newDiameter(10)
+                                                               .oldDiameter(10)
+                                                               .speed(0)
+                                                               .warningTime(0)
+                                                               .warningBlocks(0));
     }
 }
