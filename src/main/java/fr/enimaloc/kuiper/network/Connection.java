@@ -99,8 +99,12 @@ public class Connection extends Thread {
 //                             .put(VarIntUtils.getVarInt(length))
 //                             .put(inputStream.readNBytes(length));
 
+                    if (packet instanceof ServerboundHandshake) {
+                        packet.handle(this);
+                    } else {
+                        new Thread(() -> packet.handle(this)).start();
+                    }
                     exchangedPackets.add(packet);
-                    packet.handle(this);
                     lastReceived = packet;
                 }
             } catch (IOException e) {
