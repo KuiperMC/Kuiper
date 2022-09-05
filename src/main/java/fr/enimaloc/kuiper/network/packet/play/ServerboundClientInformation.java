@@ -97,6 +97,7 @@ public class ServerboundClientInformation extends SimpleClassDescriptor implemen
                                                                                150, 151, 152, 153, 154, 155, 156, 157))
                                       .item(new ClientboundUpdateTags.Tag("coals", 263, 173)));
         connection.sendPacket(new ClientboundEntityEvent().entityId(0).status(Player.Status.OP_LEVEL_4));
+        connection.sendPacket(new ClientboundCommandsPacket());
         connection.sendPacket(new ClientboundPlayerInfo().add(connection.player.uuid(),
                                                               connection.player.name(),
                                                               Gamemode.CREATIVE,
