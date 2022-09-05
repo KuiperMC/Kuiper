@@ -34,6 +34,10 @@ public class BinaryWriter extends OutputStream {
         this(buffer, true);
     }
 
+    public BinaryWriter(int size, boolean resizable) {
+        this(ByteBuffer.allocate(size), resizable);
+    }
+
     public BinaryWriter(int size) {
         this(ByteBuffer.allocate(size));
     }
@@ -53,14 +57,15 @@ public class BinaryWriter extends OutputStream {
         }
     }
 
-    private void resize(int length) {
+    public BinaryWriter resize(int length) {
         if (!resizable) {
-            return;
+            return this;
         }
         var copy = buffer.isDirect() ?
                 ByteBuffer.allocateDirect(length) : ByteBuffer.allocate(length);
         copy.put(buffer.flip());
         this.buffer = copy;
+        return this;
     }
 
     public BinaryWriter writeByte(byte b) {
@@ -284,8 +289,7 @@ public class BinaryWriter extends OutputStream {
                 break;
             }
         }
-        resize(j + 1);
-        return this;
+        return resize(j + 1);
     }
 
     public static byte[] makeArray(Consumer<BinaryWriter> writing) {

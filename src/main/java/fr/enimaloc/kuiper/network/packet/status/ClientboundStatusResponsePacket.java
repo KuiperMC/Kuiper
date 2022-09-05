@@ -7,11 +7,11 @@
  */
 package fr.enimaloc.kuiper.network.packet.status;
 
-import fr.enimaloc.kuiper.network.Connection;
 import fr.enimaloc.kuiper.network.Packet;
 import fr.enimaloc.kuiper.network.data.BinaryWriter;
 import fr.enimaloc.kuiper.network.data.SizedStrategy;
 import fr.enimaloc.kuiper.utils.SimpleClassDescriptor;
+import fr.enimaloc.kuiper.utils.VarIntUtils;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -89,17 +89,26 @@ public class ClientboundStatusResponsePacket extends SimpleClassDescriptor imple
 
     @Override
     public void write(BinaryWriter binaryWriter) {
+        binaryWriter.writeString(createJson(), SizedStrategy.VARINT);
+    }
+
+    @Override
+    public int length() {
+        return VarIntUtils.varIntSize(createJson().length()) + createJson().length();
+    }
+
+    private String createJson() {
         StringJoiner json = new StringJoiner(",", "{", "}");
         json.add("\"version\":" + version)
             .add("\"players\":" + players);
 //        if (description != null) {
 //            json.add("\"description\":" + description);
 //        }
-            json.add("\"description\":{\"text\":\"Kuiper\"}");
+        json.add("\"description\":{\"text\":\"Kuiper\"}");
         if (favicon != null) {
             json.add("\"favicon\":" + favicon);
         }
-        binaryWriter.writeString(json.toString(), SizedStrategy.VARINT);
+        return json.toString();
     }
 
     public record MinecraftVersion(String name, int protocolVersion) {
