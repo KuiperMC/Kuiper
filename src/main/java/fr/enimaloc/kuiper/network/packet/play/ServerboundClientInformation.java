@@ -118,6 +118,7 @@ public class ServerboundClientInformation extends SimpleClassDescriptor implemen
                 section.blockPalette().fill(1);
                 Chunk        chunk        = new Chunk(x, z, new ChunkSection[]{section});
                 connection.sendPacket(new ClientboundLightUpdate().chunk(chunk));
+                connection.sendPacket(new ClientboundLevelChunkWithLight().chunk(chunk));
             }
         }
         Connection.LOGGER.makeLoggingEventBuilder(Level.INFO)
