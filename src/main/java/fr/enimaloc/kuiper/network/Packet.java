@@ -57,6 +57,7 @@ public interface Packet {
         CLIENTBOUND_SET_COMPRESSION(Type.CLIENTBOUND, 0x03, GameState.LOGIN),
         CLIENTBOUND_LOGIN_SUCCESS(Type.CLIENTBOUND, 0x02, GameState.LOGIN),
 
+        SERVERBOUND_ACCEPT_TELEPORTATION(Type.SERVERBOUND, 0x00, GameState.PLAY, ServerboundAcceptTeleportation::new),
         SERVERBOUND_CLIENT_INFORMATION(Type.SERVERBOUND, 0x07, GameState.PLAY, ServerboundClientInformation::new),
         CLIENTBOUND_CHANGE_DIFFICULTY(Type.CLIENTBOUND, 0x0B, GameState.PLAY),
         SERVERBOUND_CUSTOM_PAYLOAD(Type.SERVERBOUND, 0x0C, GameState.PLAY, ServerboundCustomPayload::new),
