@@ -133,5 +133,8 @@ public class ServerboundClientInformation extends SimpleClassDescriptor implemen
                                                                .warningTime(0)
                                                                .warningBlocks(0));
         connection.sendPacket(new ClientboundSetDefaultSpawnPosition().position(0, 0, 0));
+        connection.sendPacket(new ClientboundSynchronizePosition().position(new Location.Position(0, 0, 0))
+                                                                  .yaw(0f)
+                                                                  .pitch(0f));
     }
 }
