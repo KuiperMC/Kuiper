@@ -27,6 +27,11 @@ public class Player {
     public       boolean    serverListing;
     public       String     brand;
     public       short      slot;
+    public double x;
+    public double y;
+    public double z;
+    public float  yaw;
+    public float  pitch;
     private      String     name;
     private      UUID       uuid;
     public final Connection connection;
