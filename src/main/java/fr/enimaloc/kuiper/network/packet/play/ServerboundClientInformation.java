@@ -57,5 +57,6 @@ public class ServerboundClientInformation extends SimpleClassDescriptor implemen
         player.rightMainHand = mainHand == 1;
         player.textFiltering = textFiltering;
         player.serverListing = serverListing;
+        connection.sendPacket(new ClientboundSetCarriedItem().slot((byte) 4));
     }
 }

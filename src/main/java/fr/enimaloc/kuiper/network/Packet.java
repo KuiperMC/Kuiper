@@ -63,6 +63,7 @@ public interface Packet {
         CLIENTBOUND_CUSTOM_PAYLOAD(Type.CLIENTBOUND, 0x15, GameState.PLAY),
         CLIENTBOUND_LOGIN(Type.CLIENTBOUND, 0x23, GameState.PLAY),
         CLIENTBOUND_PLAYER_ABILITIES(Type.CLIENTBOUND, 0x2F, GameState.PLAY),
+        CLIENTBOUND_SET_CARRIED_ITEM(Type.CLIENTBOUND, 0x47, GameState.PLAY),
         ;
 
         public final GameState                                state;
