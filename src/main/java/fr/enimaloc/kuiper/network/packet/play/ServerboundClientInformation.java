@@ -14,10 +14,13 @@ import fr.enimaloc.kuiper.network.Packet;
 import fr.enimaloc.kuiper.network.data.BinaryReader;
 import fr.enimaloc.kuiper.network.data.SizedStrategy;
 import fr.enimaloc.kuiper.objects.Gamemode;
-import fr.enimaloc.kuiper.objects.Identifier;
-import fr.enimaloc.kuiper.objects.Slot;
 import fr.enimaloc.kuiper.utils.SimpleClassDescriptor;
+import fr.enimaloc.kuiper.world.Chunk;
+import fr.enimaloc.kuiper.world.ChunkSection;
 import java.util.Locale;
+import org.slf4j.event.Level;
+
+import static fr.enimaloc.kuiper.MinecraftServer.Markers.*;
 
 /**
  *
@@ -105,5 +108,21 @@ public class ServerboundClientInformation extends SimpleClassDescriptor implemen
                                                               null));
         connection.sendPacket(new ClientboundPlayerInfo().updateLatency(connection.player.uuid(), 100));
         connection.sendPacket(new ClientboundSetCenterChunk().x(0).z(0));
+        int i1 = 0, i2 = 0;
+        for (int x = -connection.server.settings.viewDistance; x <= connection.server.settings.viewDistance; x++) {
+            i1++;
+            i2 = 0;
+            for (int z = -connection.server.settings.viewDistance; z <= connection.server.settings.viewDistance; z++) {
+                i2++;
+                ChunkSection section = new ChunkSection(x, 0, z);
+                section.blockPalette().fill(1);
+                Chunk        chunk        = new Chunk(x, z, new ChunkSection[]{section});
+                connection.sendPacket(new ClientboundLightUpdate().chunk(chunk));
+            }
+        }
+        Connection.LOGGER.makeLoggingEventBuilder(Level.INFO)
+                         .addMarker(NETWORK)
+                         .addMarker(NETWORK_OUT)
+                         .log("Sent {}x{} chunks for a total of {} chunks", i1, i2, i1 * i2);
     }
 }
