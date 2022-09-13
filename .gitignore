@@ -43,3 +43,6 @@ bin/
 
 ### Generated files ###
 src/main/resources/generated/
+
+### Solarlint ###
+/.idea/solarlint/issuestore/
