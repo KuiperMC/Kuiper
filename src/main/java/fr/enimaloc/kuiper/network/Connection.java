@@ -38,7 +38,6 @@ import static fr.enimaloc.kuiper.MinecraftServer.Markers.*;
 public class Connection implements Runnable {
 
     public static final Logger LOGGER = (Logger) LoggerFactory.getLogger(Connection.class);
-    public static final  Logger          LOGGER = (Logger) LoggerFactory.getLogger(Connection.class);
     private static final ExecutorService POOL   = Executors.newFixedThreadPool(10);
 
     @NotNull
