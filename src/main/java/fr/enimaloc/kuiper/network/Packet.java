@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import fr.enimaloc.kuiper.network.packet.unknown.ServerboundHandshake;
 /**
  *
  */
@@ -39,6 +40,7 @@ public interface Packet extends Writeable {
     }
 
     enum PacketList {
+        SERVERBOUND_HANDSHAKE(0x00, GameState.UNKNOWN, ServerboundHandshake.class, ServerboundHandshake::new),
         ;
 
         public final GameState                                state;

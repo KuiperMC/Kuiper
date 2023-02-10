@@ -11,6 +11,7 @@ import ch.qos.logback.classic.Logger;
 import fr.enimaloc.kuiper.GameState;
 import fr.enimaloc.kuiper.network.data.BinaryReader;
 import fr.enimaloc.kuiper.network.data.BinaryWriter;
+import fr.enimaloc.kuiper.network.packet.unknown.ServerboundHandshake;
 import fr.enimaloc.kuiper.utils.VarIntUtils;
 import java.io.IOException;
 import java.io.InputStream;
