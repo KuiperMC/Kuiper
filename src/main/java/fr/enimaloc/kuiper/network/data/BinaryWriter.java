@@ -20,6 +20,7 @@ import java.util.function.Consumer;
 /**
  *
  */
+@SuppressWarnings("UnusedReturnValue")
 public class BinaryWriter extends OutputStream {
 
     private final boolean    resizable;

@@ -98,6 +98,7 @@ public class LoggerConfigurator extends ContextAwareBase implements Configurator
                 StackTraceElement datum     = event.getCallerData()[0];
                 int               i         = 1;
                 boolean           isLogging = datum.getMethodName().startsWith("log");
+                //noinspection SpellCheckingInspection
                 while (datum.getClassName().startsWith("uk.org.lidalia.sysoutslf4j") && isLogging) {
                     datum = event.getCallerData()[i++];
                 }

@@ -169,8 +169,8 @@ public class BinaryReader extends InputStream {
     }
 
     public <T extends Readable> T[] readArray(SizedStrategy strategy, Supplier<T> supplier) {
-        int length = strategy.reader.apply(this).intValue();
-        T[] array = (T[]) new Readable[length];
+        int                                length = strategy.reader.apply(this).intValue();
+        @SuppressWarnings("unchecked") T[] array  = (T[]) new Readable[length];
         for (int i = 0; i < length; i++) {
             array[i] = read(supplier);
         }
