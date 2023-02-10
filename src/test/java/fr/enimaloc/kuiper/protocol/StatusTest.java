@@ -14,7 +14,9 @@ import fr.enimaloc.kuiper.network.Packet;
 import fr.enimaloc.kuiper.network.data.BinaryReader;
 import fr.enimaloc.kuiper.network.data.BinaryWriter;
 import fr.enimaloc.kuiper.network.data.SizedStrategy;
+import fr.enimaloc.kuiper.network.packet.status.ClientboundPingResponse;
 import fr.enimaloc.kuiper.network.packet.status.ClientboundStatusResponse;
+import fr.enimaloc.kuiper.network.packet.status.ServerboundPingRequest;
 import fr.enimaloc.kuiper.network.packet.status.ServerboundStatusRequest;
 import fr.enimaloc.kuiper.network.packet.unknown.ServerboundHandshake;
 import fr.enimaloc.kuiper.utils.VarIntUtils;
@@ -94,6 +96,23 @@ public class StatusTest {
         assertEquals(759, packet.getVersion().getProtocol());
     }
 
+    @Test
+    void pingRequest() {
+        client.send(new ServerboundHandshake().setProtocolVersion(172)
+                .setServerAddress("test.localhost")
+                .setServerPort(kuiper.getSettings().port)
+                .setState(GameState.STATUS));
+        client.send(new ServerboundStatusRequest());
+        assumeTrue(client.awaitPacket().getPacketClientbound(GameState.STATUS).isPresent());
+        long payload = System.currentTimeMillis();
+        client.send(new ServerboundPingRequest(payload));
+        Connection.PartialPacket     partialPacket = client.awaitPacket();
+        Optional<Packet.Clientbound> packetOpt     = partialPacket.getPacketClientbound(GameState.STATUS);
+        assertTrue(packetOpt.isPresent());
+        assertInstanceOf(ClientboundPingResponse.class, packetOpt.get());
+        assertEquals(payload, ((ClientboundPingResponse) packetOpt.get()).getPayload());
+    }
+
     record Connection(Socket socket, InputStream input, PrintStream output) {
         public Connection(Socket socket) throws IOException{
             this(socket, socket.getInputStream(), new PrintStream(socket.getOutputStream()));
@@ -150,4 +169,29 @@ public class StatusTest {
         }
     }
 
+    protected boolean waitFor(int timeout, TimeUnit unit) {
+        return !waitFor(() -> false, timeout, unit);
+    }
+
+    protected static boolean waitFor(BooleanSupplier condition) {
+        return waitFor(condition, true);
+    }
+
+    protected static boolean waitFor(BooleanSupplier condition, boolean expected) {
+        return waitFor(condition, expected, 5, TimeUnit.SECONDS);
+    }
+
+    protected static boolean waitFor(BooleanSupplier condition, int timeout, TimeUnit unit) {
+        return waitFor(condition, true, timeout, unit);
+    }
+
+    protected static boolean waitFor(BooleanSupplier condition, boolean expected, int timeout, TimeUnit unit) {
+        long timedOut = System.currentTimeMillis() + unit.toMillis(timeout);
+        while (condition.getAsBoolean() != expected) {
+            if (System.currentTimeMillis() >= timedOut) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
