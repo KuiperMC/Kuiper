@@ -139,7 +139,7 @@ public class BinaryWriter extends OutputStream {
 
     public BinaryWriter writeString(String s, SizedStrategy strategy) {
         strategy.writer.accept(s.length(), this);
-        writeBytes(s.getBytes());
+        this.writeBytes(s.getBytes());
         return this;
     }
 
@@ -150,7 +150,7 @@ public class BinaryWriter extends OutputStream {
         }
         strategy.writer.accept(array.length, this);
         for (int i : array) {
-            writeVarInt(i);
+            this.writeVarInt(i);
         }
         return this;
     }
@@ -162,7 +162,7 @@ public class BinaryWriter extends OutputStream {
         }
         strategy.writer.accept(array.length, this);
         for (long l : array) {
-            writeVarLong(l);
+            this.writeVarLong(l);
         }
         return this;
     }
@@ -174,7 +174,7 @@ public class BinaryWriter extends OutputStream {
         }
         strategy.writer.accept(array.length, this);
         for (long l : array) {
-            writeLong(l);
+            this.writeLong(l);
         }
         return this;
     }
@@ -201,14 +201,14 @@ public class BinaryWriter extends OutputStream {
         }
         strategy.writer.accept(array.length, this);
         for (String s : array) {
-            writeString(s, stringStrategy);
+            this.writeString(s, stringStrategy);
         }
         return this;
     }
 
     public BinaryWriter writeUUID(UUID uuid) {
-        writeLong(uuid.getMostSignificantBits());
-        writeLong(uuid.getLeastSignificantBits());
+        this.writeLong(uuid.getMostSignificantBits());
+        this.writeLong(uuid.getLeastSignificantBits());
         return this;
     }
 
@@ -224,7 +224,7 @@ public class BinaryWriter extends OutputStream {
         }
         strategy.writer.accept(array.length, this);
         for (Writeable writeable : array) {
-            write(writeable);
+            this.write(writeable);
         }
         return this;
     }
@@ -309,13 +309,13 @@ public class BinaryWriter extends OutputStream {
     private BinaryWriter writeSizedStrategy(int length, SizedStrategy strategy) {
         switch (strategy) {
             case VARINT:
-                writeVarInt(length);
+                this.writeVarInt(length);
                 break;
             case SHORT:
-                writeShort((short) length);
+                this.writeShort((short) length);
                 break;
             case INT:
-                writeInt(length);
+                this.writeInt(length);
                 break;
             case NONE:
                 break;
