@@ -78,7 +78,7 @@ public class Connection implements Runnable {
                                                           .put(inputStream.readNBytes(lenVarInt.value()))
                                                           .rewind())) {
 
-                    int                length   = reader.readVarInt();
+                    reader.readVarInt(); // Remove length var int from buffer
                     int                packetId = reader.readVarInt();
                     Packet.Serverbound packet   = Packet.Serverbound.get(packetId, gameState).build(reader);
                     LOGGER.makeLoggingEventBuilder(Level.DEBUG)
