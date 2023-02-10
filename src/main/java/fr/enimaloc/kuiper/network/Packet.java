@@ -75,6 +75,16 @@ public interface Packet {
             }
             return (Serverbound) packetBuilder.apply(reader);
         }
+
+        @Override
+        public String toString() {
+            return "PacketList{" +
+                    "state=" + state +
+                    ", type=" + type +
+                    ", id=" + id +
+                    ", clazz=" + clazz +
+                    '}';
+        }
     }
 
     enum Type {

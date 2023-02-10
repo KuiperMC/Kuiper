@@ -210,4 +210,13 @@ public class BinaryReader extends InputStream {
         buffer.get(output, 0, output.length);
         return output;
     }
+
+    @Override
+    public String toString() {
+        return "BinaryReader{" +
+                "buffer=" + buffer +
+                ", position=" + buffer.position() +
+                ", toString='" + new String(buffer.array()) + '\'' +
+                '}';
+    }
 }

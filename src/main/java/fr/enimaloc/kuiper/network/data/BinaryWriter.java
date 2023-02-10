@@ -323,4 +323,12 @@ public class BinaryWriter extends OutputStream {
         return this;
     }
 
+    @Override
+    public String toString() {
+        return "BinaryWriter{" +
+                "resizable=" + resizable +
+                ", buffer=" + buffer +
+                ", toString=" + new String(buffer.array()) +
+                '}';
+    }
 }

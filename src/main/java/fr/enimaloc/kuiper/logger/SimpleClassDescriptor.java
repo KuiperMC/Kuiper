@@ -5,7 +5,7 @@
  *
  * 03/09/2022
  */
-package fr.enimaloc.kuiper.utils;
+package fr.enimaloc.kuiper.logger;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
