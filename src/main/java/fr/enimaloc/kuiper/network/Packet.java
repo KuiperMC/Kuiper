@@ -24,10 +24,10 @@ public interface Packet {
 
     int getPacketId();
 
-    public interface Clientbound extends Packet, Writeable {
+    interface Clientbound extends Packet, Writeable {
     }
 
-    public interface Serverbound extends Packet {
+    interface Serverbound extends Packet {
 
         static PacketList get(int id, GameState gameState) {
             return PacketList.filter(packet -> packet.id == id

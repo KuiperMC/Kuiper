@@ -119,9 +119,9 @@ public class Connection implements Runnable {
               .addMarker(NETWORK)
               .addMarker(NETWORK_OUT)
               .log("SERVER -> {}: {}", socket.getInetAddress().getHostAddress(), packet);
-        try (BinaryWriter writer = new BinaryWriter(0).writeVarInt(packet.id())
+        try (BinaryWriter writer = new BinaryWriter(0).writeVarInt(packet.getPacketId())
                                                       .write(packet)
-                                                      .trim();
+                                                      .trim()
         ) {
             byte[] varInt = VarIntUtils.getVarInt(writer.getBuffer().array().length);
             byte[] bytes  = new byte[writer.getBuffer().array().length + varInt.length];
