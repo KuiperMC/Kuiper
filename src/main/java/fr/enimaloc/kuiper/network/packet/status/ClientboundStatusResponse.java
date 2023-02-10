@@ -16,7 +16,7 @@ import fr.enimaloc.kuiper.network.Packet;
 import fr.enimaloc.kuiper.network.data.BinaryReader;
 import fr.enimaloc.kuiper.network.data.BinaryWriter;
 import fr.enimaloc.kuiper.network.data.SizedStrategy;
-import fr.enimaloc.kuiper.utils.SimpleClassDescriptor;
+import fr.enimaloc.kuiper.logger.SimpleClassDescriptor;
 
 import java.util.*;
 

@@ -7,7 +7,7 @@
  */
 package fr.enimaloc.kuiper.logger;
 
-import fr.enimaloc.kuiper.utils.SimpleClassDescriptor;
+import fr.enimaloc.kuiper.logger.SimpleClassDescriptor;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

@@ -8,7 +8,7 @@
 package fr.enimaloc.kuiper.mojang;
 
 import com.google.gson.annotations.Expose;
-import fr.enimaloc.kuiper.utils.SimpleClassDescriptor;
+import fr.enimaloc.kuiper.logger.SimpleClassDescriptor;
 
 /**
  *
