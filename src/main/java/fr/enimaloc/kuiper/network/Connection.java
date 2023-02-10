@@ -94,11 +94,6 @@ public class Connection extends Thread {
                                          .collect(Collectors.joining(" ")));
                     }
 
-//            int length = lenVarInt.value();
-//            return ByteBuffer.allocate(length + lenVarInt.length())
-//                             .put(VarIntUtils.getVarInt(length))
-//                             .put(inputStream.readNBytes(length));
-
                     if (packet instanceof ServerboundHandshake) {
                         packet.handle(this);
                     } else {
@@ -108,10 +103,6 @@ public class Connection extends Thread {
                     lastReceived = packet;
                 }
             } catch (IOException e) {
-//                LOGGER.makeLoggingEventBuilder(Level.ERROR)
-//                      .addMarker(NETWORK)
-//                      .setCause(e)
-//                      .log("Error while reading packet");
                 terminate(e);
             }
         }

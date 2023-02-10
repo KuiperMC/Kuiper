@@ -206,7 +206,6 @@ public class BinaryReader extends InputStream {
         int endingPosition = getBuffer().position();
         byte[] output = new byte[endingPosition - startingPosition];
         buffer.get(output, 0, output.length);
-        //buffer.get(startingPosition, output);
         return output;
     }
 }
