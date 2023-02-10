@@ -46,3 +46,5 @@ src/main/resources/generated/
 
 ### Solarlint ###
 /.idea/solarlint/issuestore/
+.idea/uiDesigner.xml
+.idea/sonarlint
