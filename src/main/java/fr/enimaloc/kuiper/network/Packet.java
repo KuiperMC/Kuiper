@@ -16,6 +16,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import fr.enimaloc.kuiper.network.packet.status.ClientboundStatusResponse;
+import fr.enimaloc.kuiper.network.packet.status.ServerboundStatusRequest;
 import fr.enimaloc.kuiper.network.packet.unknown.ServerboundHandshake;
 /**
  *
@@ -41,6 +43,9 @@ public interface Packet extends Writeable {
 
     enum PacketList {
         SERVERBOUND_HANDSHAKE(0x00, GameState.UNKNOWN, ServerboundHandshake.class, ServerboundHandshake::new),
+
+        SERVERBOUND_STATUS_REQUEST(0x00, GameState.STATUS, ServerboundStatusRequest.class, ServerboundStatusRequest::new),
+        CLIENTBOUND_STATUS_RESPONSE(0x00, GameState.STATUS, ClientboundStatusResponse.class, ClientboundStatusResponse::new),
         ;
 
         public final GameState                                state;
