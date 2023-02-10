@@ -15,12 +15,11 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import org.jetbrains.annotations.Nullable;
 
 /**
  *
  */
-public interface Packet {
+public interface Packet extends Writeable {
 
     int getPacketId();
 
@@ -45,24 +44,25 @@ public interface Packet {
         public final GameState                                state;
         public final Type                                     type;
         public final int                                      id;
-        @Nullable
+        public final Class<? extends Packet> clazz;
         public final Function<BinaryReader, ? extends Packet> packetBuilder;
 
         PacketList(
-                Type type, int id, GameState state, @Nullable Function<BinaryReader, ? extends Packet> packetBuilder
+                Type type, int id, GameState state, Class<? extends Packet> clazz, Function<BinaryReader, ? extends Packet> packetBuilder
         ) {
             this.type          = type;
             this.id            = id;
             this.state         = state;
+            this.clazz = clazz;
             this.packetBuilder = packetBuilder;
         }
 
-        PacketList(int id, GameState state, @Nullable Function<BinaryReader, ? extends Packet> packetBuilder) {
-            this(packetBuilder == null ? Type.CLIENTBOUND : Type.SERVERBOUND, id, state, packetBuilder);
+        PacketList(int id, GameState state, Class<? extends Packet> clazz, Function<BinaryReader, ? extends Packet> packetBuilder) {
+            this(Clientbound.class.isAssignableFrom(clazz) ? Type.CLIENTBOUND : Type.SERVERBOUND, id, state, clazz, packetBuilder);
         }
 
-        PacketList(Type type, int id, GameState state) {
-            this(type, id, state, null);
+        PacketList(Type type, int id, GameState state, Class<? extends Packet> clazz) {
+            this(type, id, state, clazz, null);
         }
 
         public static Optional<PacketList> filter(Predicate<PacketList> filter) {
