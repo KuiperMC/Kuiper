@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface Packet {
 
-    int id();
+    int getPacketId();
 
     public interface Clientbound extends Packet, Writeable {
     }
