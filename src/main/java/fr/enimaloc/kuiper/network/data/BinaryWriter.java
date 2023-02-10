@@ -7,7 +7,6 @@
  */
 package fr.enimaloc.kuiper.network.data;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -285,8 +284,8 @@ public class BinaryWriter extends OutputStream {
     }
 
     @Override
-    public void write(int b) throws IOException {
-        writeByte((byte) b);
+    public void write(int b) {
+        this.writeByte((byte) b);
     }
 
     public BinaryWriter trim() {

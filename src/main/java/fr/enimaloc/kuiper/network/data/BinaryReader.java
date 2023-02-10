@@ -10,6 +10,7 @@ package fr.enimaloc.kuiper.network.data;
 import fr.enimaloc.kuiper.utils.VarIntUtils;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Objects;
@@ -70,7 +71,7 @@ public class BinaryReader extends InputStream {
         try {
             return Objects.requireNonNull(VarIntUtils.readVarInt(this)).value();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -192,12 +193,12 @@ public class BinaryReader extends InputStream {
     }
 
     @Override
-    public int read() throws IOException {
+    public int read() {
         return readByte() & 0xFF;
     }
 
     @Override
-    public int available() throws IOException {
+    public int available() {
         return buffer.remaining();
     }
 
