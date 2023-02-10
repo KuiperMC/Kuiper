@@ -11,6 +11,8 @@ import ch.qos.logback.classic.Logger;
 import fr.enimaloc.kuiper.collections.Manager;
 import fr.enimaloc.kuiper.data.ServerSettings;
 import fr.enimaloc.kuiper.network.Connection;
+
+import java.io.IOException;
 import java.net.ServerSocket;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -20,28 +22,66 @@ import uk.org.lidalia.sysoutslf4j.context.SysOutOverSLF4J;
 /**
  *
  */
-public class MinecraftServer {
+public class MinecraftServer extends Thread {
 
     public static final Logger LOGGER = (Logger) LoggerFactory.getLogger(MinecraftServer.class);
 
-    private ServerSettings      settings          = new ServerSettings();
-    private Manager<Connection> connectionManager = new Manager<>(Connection::new);
+    private final ServerSettings      settings;
+    private final Manager<Connection> connectionManager = new Manager<>(Connection::new);
+    private final ServerSocket        server;
+    private       boolean             running = false;
 
-    public MinecraftServer() {
+    public MinecraftServer() throws IOException {
+        this(new ServerSettings());
+    }
+
+    public MinecraftServer(ServerSettings settings) throws IOException {
+        this.settings = settings;
+        this.server = new ServerSocket(settings.port);
+        this.start();
+    }
+
+    @Override
+    public void run() {
         LOGGER.info("Starting server on port {}", settings.port);
-        try (ServerSocket server = new ServerSocket(settings.port)) {
-            while (!server.isClosed()) {
+        running = true;
+        while (!server.isClosed()) {
+            try {
                 new Thread(connectionManager.create(server.accept())).start();
+            } catch (IOException e) {
+                if (running) { // Ignore if shutdown
+                    throw new RuntimeException(e);
+                }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
-    public static void main(String[] args) {
+    public void shutdown() throws IOException {
+        LOGGER.info("Shutting down server");
+        running = false;
+        this.interrupt();
+        server.close();
+        try {
+            this.join();
+        } catch (InterruptedException e) {
+            LOGGER.trace("Interrupted while waiting for server to stop, not really a problem, but logging it anyway", e);
+        }
+        LOGGER.info("Server stopped");
+        LOGGER.info("Thanks for using Kuiper !");
+    }
+
+    public ServerSettings getSettings() {
+        return settings;
+    }
+
+    public Manager<Connection> getConnectionManager() {
+        return connectionManager;
+    }
+
+    public static void main(String[] args) throws IOException {
         SysOutOverSLF4J.sendSystemOutAndErrToSLF4J();
 
-        new MinecraftServer();
+        new MinecraftServer().start();
     }
 
     public static class Markers {
