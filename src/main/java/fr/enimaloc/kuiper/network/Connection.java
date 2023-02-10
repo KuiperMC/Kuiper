@@ -63,7 +63,7 @@ public class Connection implements Runnable {
         try {
             inputStream = socket.getInputStream();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
         while (!socket.isClosed()) {
             try {
