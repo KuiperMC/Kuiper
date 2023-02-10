@@ -16,9 +16,12 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import fr.enimaloc.kuiper.network.packet.status.ClientboundPingResponse;
 import fr.enimaloc.kuiper.network.packet.status.ClientboundStatusResponse;
+import fr.enimaloc.kuiper.network.packet.status.ServerboundPingRequest;
 import fr.enimaloc.kuiper.network.packet.status.ServerboundStatusRequest;
 import fr.enimaloc.kuiper.network.packet.unknown.ServerboundHandshake;
+
 /**
  *
  */
@@ -39,6 +42,7 @@ public interface Packet extends Writeable {
         }
 
         void handle(Connection connection);
+
     }
 
     enum PacketList {
@@ -46,6 +50,8 @@ public interface Packet extends Writeable {
 
         SERVERBOUND_STATUS_REQUEST(0x00, GameState.STATUS, ServerboundStatusRequest.class, ServerboundStatusRequest::new),
         CLIENTBOUND_STATUS_RESPONSE(0x00, GameState.STATUS, ClientboundStatusResponse.class, ClientboundStatusResponse::new),
+        SERVERBOUND_PING_REQUEST(0x01, GameState.STATUS, ServerboundPingRequest.class, ServerboundPingRequest::new),
+        CLIENTBOUND_PING_RESPONSE(0x01, GameState.STATUS, ClientboundPingResponse.class, ClientboundPingResponse::new)
         ;
 
         public final GameState                                state;
