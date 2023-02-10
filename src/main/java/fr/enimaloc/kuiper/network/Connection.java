@@ -14,10 +14,13 @@ import fr.enimaloc.kuiper.network.data.BinaryWriter;
 import fr.enimaloc.kuiper.utils.VarIntUtils;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -34,6 +37,8 @@ import static fr.enimaloc.kuiper.MinecraftServer.Markers.*;
 public class Connection implements Runnable {
 
     public static final Logger LOGGER = (Logger) LoggerFactory.getLogger(Connection.class);
+    public static final  Logger          LOGGER = (Logger) LoggerFactory.getLogger(Connection.class);
+    private static final ExecutorService POOL   = Executors.newFixedThreadPool(10);
 
     @NotNull
     private final Socket       socket;
@@ -97,7 +102,7 @@ public class Connection implements Runnable {
                     if (packet instanceof ServerboundHandshake) {
                         packet.handle(this);
                     } else {
-                        new Thread(() -> packet.handle(this)).start();
+                        POOL.submit(() -> packet.handle(this));
                     }
                     exchangedPackets.add(packet);
                     lastReceived = packet;
