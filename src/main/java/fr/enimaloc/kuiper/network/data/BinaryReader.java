@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -67,7 +68,7 @@ public class BinaryReader extends InputStream {
 
     public int readVarInt() {
         try {
-            return VarIntUtils.readVarInt(this).value();
+            return Objects.requireNonNull(VarIntUtils.readVarInt(this)).value();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
