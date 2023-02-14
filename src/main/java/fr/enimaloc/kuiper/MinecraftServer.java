@@ -81,7 +81,7 @@ public class MinecraftServer extends Thread {
     public static void main(String[] args) throws IOException {
         SysOutOverSLF4J.sendSystemOutAndErrToSLF4J();
 
-        new MinecraftServer().start();
+        new MinecraftServer();
     }
 
     public static class Markers {
