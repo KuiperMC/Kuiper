@@ -116,7 +116,12 @@ public class Connection implements Runnable {
                     lastReceived = packet;
                 }
             } catch (IOException e) {
-                terminate(e);
+                if (!socket.isClosed()) {
+                    LOGGER.makeLoggingEventBuilder(Level.ERROR)
+                            .addMarker(NETWORK)
+                            .addMarker(NETWORK_IN)
+                            .log("Error while reading packet from {}", socket.getInetAddress().getHostAddress(), e);
+                }
             }
         }
     }
@@ -151,6 +156,10 @@ public class Connection implements Runnable {
 
             socket.getOutputStream().write(bytes);
             socket.getOutputStream().flush();
+
+            if (packet instanceof ClientboundDisconnectLogin) {
+                terminate();
+            }
         } catch (IOException e) {
             terminate(e);
         }
@@ -158,12 +167,26 @@ public class Connection implements Runnable {
 
     public void terminate(Throwable e) {
         LOGGER.error(NETWORK, "Connection terminated", e);
-        terminate();
+        switch (gameState) {
+            case LOGIN:
+                sendPacket(new ClientboundDisconnectLogin(new ChatObject(e.toString())));
+                break;
+            case PLAY:
+                // TODO: 14/02/2023 Send disconnect packet
+                break;
+        }
     }
 
     public void terminate(String reason) {
         LOGGER.debug(NETWORK, "Connection terminated: {}", reason);
-        terminate();
+        switch (gameState) {
+            case LOGIN:
+                sendPacket(new ClientboundDisconnectLogin(new ChatObject(reason)));
+                break;
+            case PLAY:
+                // TODO: 14/02/2023 Send disconnect packet
+                break;
+        }
     }
 
     public void terminate() {

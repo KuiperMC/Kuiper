@@ -61,6 +61,7 @@ public interface Packet extends Writeable {
         CLIENTBOUND_ENCRYPTION_REQUEST(0x01, GameState.LOGIN, ClientboundEncryptionRequest.class, ClientboundEncryptionRequest::new),
         SERVERBOUND_ENCRYPTION_RESPONSE(0x01, GameState.LOGIN, ServerboundEncryptionResponse.class, ServerboundEncryptionResponse::new),
         CLIENTBOUND_LOGIN_SUCCESS(0x02, GameState.LOGIN, ClientboundLoginSuccess.class, ClientboundLoginSuccess::new),
+        CLIENTBOUND_LOGIN_DISCONNECT(0x00, GameState.LOGIN, ClientboundLoginSuccess.class, ClientboundLoginSuccess::new);
         ;
 
         public final GameState                                state;
