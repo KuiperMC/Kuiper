@@ -7,7 +7,6 @@
  */
 package fr.enimaloc.kuiper.network.packet.status;
 
-import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import fr.enimaloc.kuiper.constant.Constant;
@@ -31,6 +30,8 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
 
+import static fr.enimaloc.kuiper.constant.Objects.GSON;
+
 /**
  *
  */
@@ -51,7 +52,7 @@ public class ClientboundStatusResponse extends PacketClassDescriptor implements 
     private boolean          enforceSecureChat = true;
 
     public ClientboundStatusResponse(BinaryReader reader) {
-        ClientboundStatusResponse response = new Gson().fromJson(reader.readString(SizedStrategy.VARINT), ClientboundStatusResponse.class);
+        ClientboundStatusResponse response = GSON.fromJson(reader.readString(SizedStrategy.VARINT), ClientboundStatusResponse.class);
         this.version = response.version;
         this.players = response.players;
         this.motw = response.motw;
@@ -169,7 +170,7 @@ public class ClientboundStatusResponse extends PacketClassDescriptor implements 
         if (players.online == null) {
             players.online = players.sample.size();
         }
-        return new Gson().toJson(this);
+        return GSON.toJson(this);
     }
 
     public static class MinecraftVersion {
