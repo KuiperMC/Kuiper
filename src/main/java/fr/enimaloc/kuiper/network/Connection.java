@@ -9,6 +9,7 @@ package fr.enimaloc.kuiper.network;
 
 import ch.qos.logback.classic.Logger;
 import fr.enimaloc.kuiper.GameState;
+import fr.enimaloc.kuiper.MinecraftServer;
 import fr.enimaloc.kuiper.network.data.BinaryReader;
 import fr.enimaloc.kuiper.network.data.BinaryWriter;
 import fr.enimaloc.kuiper.network.packet.unknown.ServerboundHandshake;
@@ -19,7 +20,9 @@ import java.io.UncheckedIOException;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -42,6 +45,7 @@ public class Connection implements Runnable {
 
     @NotNull
     public final  MinecraftServer     server;
+    public final  Map<String, Object> data             = new HashMap<>();
     @NotNull
     private final Socket              socket;
     @NotNull

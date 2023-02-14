@@ -55,6 +55,7 @@ public interface Packet extends Writeable {
         CLIENTBOUND_PING_RESPONSE(0x01, GameState.STATUS, ClientboundPingResponse.class, ClientboundPingResponse::new),
 
         SERVERBOUND_LOGIN_START(0x00, GameState.LOGIN, ServerboundLoginStart.class, ServerboundLoginStart::new),
+        CLIENTBOUND_ENCRYPTION_REQUEST(0x01, GameState.LOGIN, ClientboundEncryptionRequest.class, ClientboundEncryptionRequest::new),
         ;
 
         public final GameState                                state;
