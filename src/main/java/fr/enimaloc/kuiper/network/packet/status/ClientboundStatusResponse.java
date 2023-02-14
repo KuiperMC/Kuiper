@@ -10,15 +10,26 @@ package fr.enimaloc.kuiper.network.packet.status;
 import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import fr.enimaloc.kuiper.constant.Constant;
 import fr.enimaloc.kuiper.logger.PacketClassDescriptor;
+import fr.enimaloc.kuiper.logger.SimpleClassDescriptor;
 import fr.enimaloc.kuiper.mojang.ChatObject;
 import fr.enimaloc.kuiper.network.Packet;
 import fr.enimaloc.kuiper.network.data.BinaryReader;
 import fr.enimaloc.kuiper.network.data.BinaryWriter;
 import fr.enimaloc.kuiper.network.data.SizedStrategy;
-import fr.enimaloc.kuiper.logger.SimpleClassDescriptor;
+import fr.enimaloc.kuiper.object.BufferedImageCreator;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.net.URL;
+import java.nio.file.Path;
 import java.util.*;
+import java.util.List;
 
 /**
  *
@@ -50,6 +61,15 @@ public class ClientboundStatusResponse extends PacketClassDescriptor implements 
     }
 
     public ClientboundStatusResponse() {
+        try {
+            this.favicon = new Favicon(
+                    BufferedImageCreator.fromImage(new URL("https://lh3.googleusercontent.com/ogw/AAEL6sh6TvDFnVgERi85m0PbBOshRiHeQbKIXPETUeeKntg=s32-c-mo"), Favicon.IMAGE_TYPE)
+                            .resize(64, 64)
+                            .text(0, 12, 38, "Kuiper", Color.BLUE, new Font("Arial", Font.BOLD, 23))
+            );
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     public ClientboundStatusResponse setVersion(MinecraftVersion version) {
@@ -274,6 +294,89 @@ public class ClientboundStatusResponse extends PacketClassDescriptor implements 
         }
     }
 
-    private static class Favicon {
+    public static class Favicon {
+
+        public static final int WIDTH = 64;
+        public static final int HEIGHT     = 64;
+        public static final int IMAGE_TYPE = BufferedImage.TYPE_BYTE_INDEXED;
+
+        @Expose
+        private String base64;
+
+        public Favicon(BufferedImageCreator creator) throws IOException {
+            this(creator.create());
+        }
+
+        public Favicon(URL url) throws IOException {
+            this(url, "png");
+        }
+
+        public Favicon(URL url, String format) throws IOException {
+            this(ImageIO.read(url), format);
+        }
+
+        public Favicon(Path path) throws IOException {
+            this(ImageIO.read(path.toFile()), Optional.of(path)
+                    .map(Path::toString)
+                    .filter(p -> p.contains("."))
+                    .map(p -> p.substring(p.lastIndexOf(".") + 1))
+                    .orElse("png"));
+        }
+
+        public Favicon(Path path, String format) throws IOException {
+            this(ImageIO.read(path.toFile()), format);
+        }
+
+        public Favicon(BufferedImage image) throws IOException {
+            this(image, "png");
+        }
+
+        public Favicon(BufferedImage image, String format) throws IOException {
+            if (image.getWidth() != WIDTH || image.getHeight() != HEIGHT) {
+                throw new IllegalArgumentException("Image must be " + WIDTH + "x" + HEIGHT + " pixels");
+            }
+            if (image.getType() != IMAGE_TYPE) {
+                throw new IllegalArgumentException("Image must be of type " + IMAGE_TYPE);
+            }
+            if (format == null || format.isEmpty()) {
+                format = "png";
+            }
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                ImageIO.write(image, format, baos);
+                baos.flush();
+                this.base64 = "data:image/" + format + ";base64," + Base64.getEncoder().encodeToString(baos.toByteArray());
+            }
+        }
+
+        public Favicon(String base64) {
+            this.base64 = base64;
+        }
+
+        public String getBase64() {
+            return base64;
+        }
+
+        public static BufferedImageCreator createImage() {
+            return BufferedImageCreator.fromNothing(WIDTH, HEIGHT, IMAGE_TYPE);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (obj == null || obj.getClass() != this.getClass()) return false;
+            var that = (Favicon) obj;
+            return Objects.equals(this.base64, that.base64);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(base64);
+        }
+
+        @Override
+        public String toString() {
+            return "Favicon[" +
+                    "base64=" + base64 + ']';
+        }
     }
 }
