@@ -26,6 +26,7 @@ import java.nio.charset.StandardCharsets;
  *
  */
 public class LoggerConfigurator extends ContextAwareBase implements Configurator {
+    public static final boolean SHOW_LOGGER_CONFIG    = "true".equals(System.getenv("LOGGER_SHOW_CONFIG"));
     public static final boolean REDUCED               = "true".equals(System.getenv("LOGGER_REDUCED"));
     public static final boolean DISPLAY_IF_NOT_SOURCE = "true".equals(System.getenv("LOGGER_DISPLAY_IF_NOT_SOURCE"));
     public static final boolean DISPLAY_SOURCE        = "true".equals(System.getenv("LOGGER_DISPLAY_SOURCE"));
@@ -59,15 +60,19 @@ public class LoggerConfigurator extends ContextAwareBase implements Configurator
 
         Logger root = loggerContext.getLogger(Logger.ROOT_LOGGER_NAME);
         root.setAdditive(false);
-        root.setLevel(Level.toLevel(LOG_LEVEL));
         root.addAppender(appender);
 
-        root.trace("Logger configuration:");
-        root.trace("  - Reduced: {}", REDUCED);
-        root.trace("  - Display if not source: {}", DISPLAY_IF_NOT_SOURCE);
-        root.trace("  - Display source: {}", DISPLAY_SOURCE);
-        root.trace("  - Max stack trace depth: {}", MAX_STACKTRACE_DEPTH);
-        root.trace("  - Date format: {}", DATE_FORMAT);
+        if (root.isTraceEnabled() || SHOW_LOGGER_CONFIG) {
+            root.setLevel(Level.TRACE);
+            root.trace("Logger configuration:");
+            root.trace("  - Reduced: {}", REDUCED);
+            root.trace("  - Display if not source: {}", DISPLAY_IF_NOT_SOURCE);
+            root.trace("  - Display source: {}", DISPLAY_SOURCE);
+            root.trace("  - Max stack trace depth: {}", MAX_STACKTRACE_DEPTH);
+            root.trace("  - Date format: {}", DATE_FORMAT);
+            root.trace("  - Root log level: {}", LOG_LEVEL);
+        }
+        root.setLevel(Level.toLevel(LOG_LEVEL));
 
         return ExecutionStatus.DO_NOT_INVOKE_NEXT_IF_ANY;
     }
