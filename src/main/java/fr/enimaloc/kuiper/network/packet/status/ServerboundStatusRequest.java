@@ -35,7 +35,6 @@ public class ServerboundStatusRequest extends PacketClassDescriptor implements P
     @Override
     public void handle(Connection connection) {
         connection.sendPacket(new ClientboundStatusResponse()
-                .setVersion("ALPHA", 759)
                 .setPlayers(0,
                         "enimaloc",
                         "kuiper",

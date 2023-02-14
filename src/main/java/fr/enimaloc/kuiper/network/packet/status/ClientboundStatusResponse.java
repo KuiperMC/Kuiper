@@ -26,7 +26,7 @@ import java.util.*;
 public class ClientboundStatusResponse extends PacketClassDescriptor implements Packet.Clientbound {
 
     @Expose
-    private MinecraftVersion version           = new MinecraftVersion("1.19.2", 759);
+    private MinecraftVersion version           = new MinecraftVersion();
     @Expose
     private Players          players           = new Players(20);
     @Expose
@@ -157,6 +157,10 @@ public class ClientboundStatusResponse extends PacketClassDescriptor implements 
         private String name;
         @Expose
         private int    protocol;
+
+        public MinecraftVersion() {
+            this(Constant.MINECRAFT_VERSION_NAME, Constant.PROTOCOL_VERSION);
+        }
 
         public MinecraftVersion(String name, int protocol) {
             this.name = name;
