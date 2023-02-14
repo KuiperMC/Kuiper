@@ -9,6 +9,7 @@ package fr.enimaloc.kuiper.protocol;
 
 import fr.enimaloc.kuiper.GameState;
 import fr.enimaloc.kuiper.MinecraftServer;
+import fr.enimaloc.kuiper.constant.Constant;
 import fr.enimaloc.kuiper.data.ServerSettings;
 import fr.enimaloc.kuiper.network.Packet;
 import fr.enimaloc.kuiper.network.data.BinaryReader;
@@ -93,7 +94,8 @@ public class StatusTest {
         assertInstanceOf(ClientboundStatusResponse.class, packetOpt.get());
         ClientboundStatusResponse packet = (ClientboundStatusResponse) packetOpt.get();
         assertEquals(0x00, packet.getPacketId());
-        assertEquals(759, packet.getVersion().getProtocol());
+        assertEquals(Constant.PROTOCOL_VERSION, packet.getVersion().getProtocol());
+        assertEquals(Constant.MINECRAFT_VERSION_NAME, packet.getVersion().getName());
     }
 
     @Test
