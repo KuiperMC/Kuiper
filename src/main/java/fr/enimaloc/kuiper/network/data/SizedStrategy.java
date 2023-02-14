@@ -15,7 +15,7 @@ import java.util.function.Function;
  */
 public enum SizedStrategy {
     VARINT((i, writer) -> writer.writeVarInt(i.intValue()), BinaryReader::readVarInt),
-    SHORT((i, writer) -> writer.writeShort(i.shortValue()), BinaryReader::readByte),
+    SHORT((i, writer) -> writer.writeShort(i.shortValue()), BinaryReader::readShort),
     INT((i, writer) -> writer.writeInt(i.intValue()), BinaryReader::readInt),
     NONE((i, writer) -> {}, null);
 
