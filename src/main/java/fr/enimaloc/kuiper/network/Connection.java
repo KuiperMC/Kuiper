@@ -12,6 +12,7 @@ import fr.enimaloc.kuiper.GameState;
 import fr.enimaloc.kuiper.MinecraftServer;
 import fr.enimaloc.kuiper.network.data.BinaryReader;
 import fr.enimaloc.kuiper.network.data.BinaryWriter;
+import fr.enimaloc.kuiper.network.packet.login.ClientboundLoginSuccess;
 import fr.enimaloc.kuiper.network.packet.unknown.ServerboundHandshake;
 import fr.enimaloc.kuiper.utils.VarIntUtils;
 import java.io.IOException;
@@ -171,5 +172,11 @@ public class Connection implements Runnable {
         } catch (IOException e) {
             LOGGER.error(NETWORK, "Error while closing socket", e);
         }
+    }
+
+    public void startPlayState() {
+        LOGGER.info("UUID of player {} is {}.", player.getProfile().username, player.getProfile().uuid);
+        sendPacket(new ClientboundLoginSuccess(player.getProfile().uuid, player.getProfile().username));
+        gameState = GameState.PLAY;
     }
 }

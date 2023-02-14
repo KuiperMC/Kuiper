@@ -16,6 +16,9 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import fr.enimaloc.kuiper.network.packet.login.ClientboundEncryptionRequest;
+import fr.enimaloc.kuiper.network.packet.login.ClientboundLoginSuccess;
+import fr.enimaloc.kuiper.network.packet.login.ServerboundEncryptionResponse;
 import fr.enimaloc.kuiper.network.packet.login.ServerboundLoginStart;
 import fr.enimaloc.kuiper.network.packet.status.ClientboundPingResponse;
 import fr.enimaloc.kuiper.network.packet.status.ClientboundStatusResponse;
@@ -56,6 +59,8 @@ public interface Packet extends Writeable {
 
         SERVERBOUND_LOGIN_START(0x00, GameState.LOGIN, ServerboundLoginStart.class, ServerboundLoginStart::new),
         CLIENTBOUND_ENCRYPTION_REQUEST(0x01, GameState.LOGIN, ClientboundEncryptionRequest.class, ClientboundEncryptionRequest::new),
+        SERVERBOUND_ENCRYPTION_RESPONSE(0x01, GameState.LOGIN, ServerboundEncryptionResponse.class, ServerboundEncryptionResponse::new),
+        CLIENTBOUND_LOGIN_SUCCESS(0x02, GameState.LOGIN, ClientboundLoginSuccess.class, ClientboundLoginSuccess::new),
         ;
 
         public final GameState                                state;
