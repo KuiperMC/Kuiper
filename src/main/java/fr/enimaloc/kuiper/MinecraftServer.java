@@ -47,7 +47,7 @@ public class MinecraftServer extends Thread {
         running = true;
         while (!server.isClosed()) {
             try {
-                new Thread(connectionManager.create(server.accept())).start();
+                new Thread(connectionManager.create(server.accept(), this)).start();
             } catch (IOException e) {
                 if (running) { // Ignore if shutdown
                     throw new RuntimeException(e);

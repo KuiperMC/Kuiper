@@ -41,20 +41,23 @@ public class Connection implements Runnable {
     private static final ExecutorService POOL   = Executors.newFixedThreadPool(10);
 
     @NotNull
-    private final Socket       socket;
+    public final  MinecraftServer     server;
+    @NotNull
+    private final Socket              socket;
     @NotNull
     private final List<Packet> exchangedPackets = new ArrayList<>();
     public        GameState    gameState        = GameState.UNKNOWN;
     @Nullable
     private       Packet       lastReceived;
 
-    public Connection(@NotNull Socket socket) {
+    public Connection(@NotNull Socket socket, @NotNull MinecraftServer server) {
+        this.server = server;
         LOGGER.debug(NETWORK, "New connection from {}", socket.getInetAddress().getHostAddress());
         this.socket = socket;
     }
 
     public Connection(Object... args) {
-        this((Socket) args[0]);
+        this((Socket) args[0], (MinecraftServer) args[1]);
     }
 
     @Override
