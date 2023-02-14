@@ -10,6 +10,7 @@ package fr.enimaloc.kuiper;
 import ch.qos.logback.classic.Logger;
 import fr.enimaloc.kuiper.collections.Manager;
 import fr.enimaloc.kuiper.data.ServerSettings;
+import fr.enimaloc.kuiper.mojang.auth.MojangAuth;
 import fr.enimaloc.kuiper.network.Connection;
 
 import java.io.IOException;
@@ -44,10 +45,11 @@ public class MinecraftServer extends Thread {
     @Override
     public void run() {
         LOGGER.info("Starting server on port {}", settings.port);
+        MojangAuth.init();
         running = true;
         while (!server.isClosed()) {
             try {
-                new Thread(connectionManager.create(server.accept())).start();
+                new Thread(connectionManager.create(server.accept(), this)).start();
             } catch (IOException e) {
                 if (running) { // Ignore if shutdown
                     throw new RuntimeException(e);

@@ -9,8 +9,10 @@ package fr.enimaloc.kuiper.network;
 
 import ch.qos.logback.classic.Logger;
 import fr.enimaloc.kuiper.GameState;
+import fr.enimaloc.kuiper.MinecraftServer;
 import fr.enimaloc.kuiper.network.data.BinaryReader;
 import fr.enimaloc.kuiper.network.data.BinaryWriter;
+import fr.enimaloc.kuiper.network.packet.login.ClientboundLoginSuccess;
 import fr.enimaloc.kuiper.network.packet.unknown.ServerboundHandshake;
 import fr.enimaloc.kuiper.utils.VarIntUtils;
 import java.io.IOException;
@@ -19,7 +21,9 @@ import java.io.UncheckedIOException;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -41,20 +45,24 @@ public class Connection implements Runnable {
     private static final ExecutorService POOL   = Executors.newFixedThreadPool(10);
 
     @NotNull
-    private final Socket       socket;
+    public final  MinecraftServer     server;
+    public final  Map<String, Object> data             = new HashMap<>();
+    @NotNull
+    private final Socket              socket;
     @NotNull
     private final List<Packet> exchangedPackets = new ArrayList<>();
     public        GameState    gameState        = GameState.UNKNOWN;
     @Nullable
     private       Packet       lastReceived;
 
-    public Connection(@NotNull Socket socket) {
+    public Connection(@NotNull Socket socket, @NotNull MinecraftServer server) {
+        this.server = server;
         LOGGER.debug(NETWORK, "New connection from {}", socket.getInetAddress().getHostAddress());
         this.socket = socket;
     }
 
     public Connection(Object... args) {
-        this((Socket) args[0]);
+        this((Socket) args[0], (MinecraftServer) args[1]);
     }
 
     @Override
@@ -108,7 +116,12 @@ public class Connection implements Runnable {
                     lastReceived = packet;
                 }
             } catch (IOException e) {
-                terminate(e);
+                if (!socket.isClosed()) {
+                    LOGGER.makeLoggingEventBuilder(Level.ERROR)
+                            .addMarker(NETWORK)
+                            .addMarker(NETWORK_IN)
+                            .log("Error while reading packet from {}", socket.getInetAddress().getHostAddress(), e);
+                }
             }
         }
     }
@@ -143,6 +156,10 @@ public class Connection implements Runnable {
 
             socket.getOutputStream().write(bytes);
             socket.getOutputStream().flush();
+
+            if (packet instanceof ClientboundDisconnectLogin) {
+                terminate();
+            }
         } catch (IOException e) {
             terminate(e);
         }
@@ -150,12 +167,26 @@ public class Connection implements Runnable {
 
     public void terminate(Throwable e) {
         LOGGER.error(NETWORK, "Connection terminated", e);
-        terminate();
+        switch (gameState) {
+            case LOGIN:
+                sendPacket(new ClientboundDisconnectLogin(new ChatObject(e.toString())));
+                break;
+            case PLAY:
+                // TODO: 14/02/2023 Send disconnect packet
+                break;
+        }
     }
 
     public void terminate(String reason) {
         LOGGER.debug(NETWORK, "Connection terminated: {}", reason);
-        terminate();
+        switch (gameState) {
+            case LOGIN:
+                sendPacket(new ClientboundDisconnectLogin(new ChatObject(reason)));
+                break;
+            case PLAY:
+                // TODO: 14/02/2023 Send disconnect packet
+                break;
+        }
     }
 
     public void terminate() {
@@ -164,5 +195,11 @@ public class Connection implements Runnable {
         } catch (IOException e) {
             LOGGER.error(NETWORK, "Error while closing socket", e);
         }
+    }
+
+    public void startPlayState() {
+        LOGGER.info("UUID of player {} is {}.", player.getProfile().username, player.getProfile().uuid);
+        sendPacket(new ClientboundLoginSuccess(player.getProfile().uuid, player.getProfile().username));
+        gameState = GameState.PLAY;
     }
 }

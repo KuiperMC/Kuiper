@@ -16,6 +16,10 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import fr.enimaloc.kuiper.network.packet.login.ClientboundEncryptionRequest;
+import fr.enimaloc.kuiper.network.packet.login.ClientboundLoginSuccess;
+import fr.enimaloc.kuiper.network.packet.login.ServerboundEncryptionResponse;
+import fr.enimaloc.kuiper.network.packet.login.ServerboundLoginStart;
 import fr.enimaloc.kuiper.network.packet.status.ClientboundPingResponse;
 import fr.enimaloc.kuiper.network.packet.status.ClientboundStatusResponse;
 import fr.enimaloc.kuiper.network.packet.status.ServerboundPingRequest;
@@ -51,7 +55,13 @@ public interface Packet extends Writeable {
         SERVERBOUND_STATUS_REQUEST(0x00, GameState.STATUS, ServerboundStatusRequest.class, ServerboundStatusRequest::new),
         CLIENTBOUND_STATUS_RESPONSE(0x00, GameState.STATUS, ClientboundStatusResponse.class, ClientboundStatusResponse::new),
         SERVERBOUND_PING_REQUEST(0x01, GameState.STATUS, ServerboundPingRequest.class, ServerboundPingRequest::new),
-        CLIENTBOUND_PING_RESPONSE(0x01, GameState.STATUS, ClientboundPingResponse.class, ClientboundPingResponse::new)
+        CLIENTBOUND_PING_RESPONSE(0x01, GameState.STATUS, ClientboundPingResponse.class, ClientboundPingResponse::new),
+
+        SERVERBOUND_LOGIN_START(0x00, GameState.LOGIN, ServerboundLoginStart.class, ServerboundLoginStart::new),
+        CLIENTBOUND_ENCRYPTION_REQUEST(0x01, GameState.LOGIN, ClientboundEncryptionRequest.class, ClientboundEncryptionRequest::new),
+        SERVERBOUND_ENCRYPTION_RESPONSE(0x01, GameState.LOGIN, ServerboundEncryptionResponse.class, ServerboundEncryptionResponse::new),
+        CLIENTBOUND_LOGIN_SUCCESS(0x02, GameState.LOGIN, ClientboundLoginSuccess.class, ClientboundLoginSuccess::new),
+        CLIENTBOUND_LOGIN_DISCONNECT(0x00, GameState.LOGIN, ClientboundLoginSuccess.class, ClientboundLoginSuccess::new);
         ;
 
         public final GameState                                state;
